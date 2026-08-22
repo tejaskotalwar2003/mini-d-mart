@@ -215,7 +215,7 @@ export const ProductList: React.FC = () => {
       emoji: '🧼',
     },
     'raksha-bandhan': {
-      img: 'https://images.unsplash.com/photo-1513201099705-a9746072f579?auto=format&fit=crop&w=300&q=80',
+      img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=300&q=80',
       gradient: 'from-rose-50 to-amber-100',
       emoji: '🪢',
     },
@@ -225,7 +225,7 @@ export const ProductList: React.FC = () => {
       emoji: '🍳',
     },
     'dry-fruits-nuts': {
-      img: 'https://images.unsplash.com/photo-1563412885-139e4045ec52?auto=format&fit=crop&w=300&q=80',
+      img: 'https://images.unsplash.com/photo-1508061253366-f7da158b6d46?auto=format&fit=crop&w=300&q=80',
       gradient: 'from-amber-50 to-yellow-100',
       emoji: '🥜',
     },
@@ -235,7 +235,7 @@ export const ProductList: React.FC = () => {
       emoji: '🌾',
     },
     'breakfast-cereals': {
-      img: 'https://images.unsplash.com/photo-1543733037-3c05fd8d01f4?auto=format&fit=crop&w=300&q=80',
+      img: 'https://images.unsplash.com/photo-1521483451569-e33803c0330c?auto=format&fit=crop&w=300&q=80',
       gradient: 'from-orange-50 to-amber-100',
       emoji: '🥣',
     },
@@ -245,7 +245,7 @@ export const ProductList: React.FC = () => {
       emoji: '👶',
     },
     'health-wellness': {
-      img: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?auto=format&fit=crop&w=300&q=80',
+      img: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=300&q=80',
       gradient: 'from-teal-50 to-emerald-100',
       emoji: '💊',
     },
