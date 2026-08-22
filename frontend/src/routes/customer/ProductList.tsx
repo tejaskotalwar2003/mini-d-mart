@@ -139,40 +139,41 @@ export const ProductList: React.FC = () => {
   const categoryImageMeta: Record<string, { img: string; gradient: string; emoji: string }> = {
     'fruits-vegetables': {
       img: 'https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&w=300&q=80',
-      gradient: 'from-green-400 to-emerald-600',
+      gradient: 'from-green-50 to-emerald-100',
       emoji: '🍎',
     },
     'dairy-bakery': {
       img: 'https://images.unsplash.com/photo-1628088062854-d1870b4553da?auto=format&fit=crop&w=300&q=80',
-      gradient: 'from-yellow-300 to-amber-500',
+      gradient: 'from-yellow-50 to-amber-100',
       emoji: '🥛',
     },
     'snacks-beverages': {
       img: 'https://images.unsplash.com/photo-1527960471264-932f39eb5846?auto=format&fit=crop&w=300&q=80',
-      gradient: 'from-orange-400 to-red-500',
+      gradient: 'from-orange-50 to-red-100',
       emoji: '🧃',
     },
     'instant-frozen-food': {
       img: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=300&q=80',
-      gradient: 'from-blue-400 to-indigo-600',
+      gradient: 'from-blue-50 to-indigo-100',
       emoji: '🍜',
     },
     'munchies-chips': {
       img: 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=300&q=80',
-      gradient: 'from-amber-400 to-orange-600',
+      gradient: 'from-amber-50 to-orange-100',
       emoji: '🍟',
     },
     'personal-care': {
       img: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=300&q=80',
-      gradient: 'from-pink-400 to-rose-600',
+      gradient: 'from-pink-50 to-rose-100',
       emoji: '🧴',
     },
     'household-essentials': {
       img: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?auto=format&fit=crop&w=300&q=80',
-      gradient: 'from-cyan-400 to-sky-600',
+      gradient: 'from-cyan-50 to-sky-100',
       emoji: '🧼',
     },
   };
+
 
   const activeFilterCount =
     (debouncedSearch ? 1 : 0) +
@@ -230,11 +231,11 @@ export const ProductList: React.FC = () => {
         </div>
       </div>
 
-      {/* Category Image Cards (Blinkit style) */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-3 sm:p-5 shadow-sm">
-        <div className="flex items-center justify-between mb-3 sm:mb-4">
-          <h2 className="text-xs sm:text-sm font-extrabold text-gray-900 uppercase tracking-wider">
-            🛒 Shop by Category
+      {/* Category Grid (BigBasket / JioMart style) */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-base sm:text-lg font-extrabold text-gray-900">
+            Shop by Category
           </h2>
           {selectedCategory && (
             <button
@@ -246,63 +247,62 @@ export const ProductList: React.FC = () => {
           )}
         </div>
 
-        {/* Scrollable image cards row */}
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory">
+        {/* 4-column grid on all screens, 2-col on tiny mobile */}
+        <div className="grid grid-cols-2 xs:grid-cols-4 sm:grid-cols-4 gap-3 sm:gap-4">
           {/* "All" card */}
           <button
             onClick={() => { setSelectedCategory(''); setPage(1); }}
-            className={`flex-shrink-0 snap-start flex flex-col items-center gap-1.5 group focus:outline-none`}
+            className="flex flex-col items-center gap-2 group focus:outline-none"
           >
-            <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-2xl flex items-center justify-center overflow-hidden relative transition-all duration-200 ${
-              selectedCategory === ''
-                ? 'ring-3 ring-emerald-500 ring-offset-2 shadow-lg scale-105'
-                : 'hover:scale-105 hover:shadow-md'
-            } bg-gradient-to-br from-emerald-400 to-teal-600`}>
+            <div className={`w-full aspect-square rounded-2xl overflow-hidden relative transition-all duration-200 bg-gradient-to-br from-emerald-50 to-teal-100 border-2 ${
+              selectedCategory === '' ? 'border-emerald-500 shadow-md' : 'border-transparent hover:border-emerald-300 hover:shadow-sm'
+            }`}>
               <img
-                src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=200&q=80"
+                src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80"
                 alt="All Products"
-                className="w-full h-full object-cover opacity-80"
+                className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 flex items-center justify-center bg-black/10">
-                <span className="text-2xl">🛍️</span>
-              </div>
+              {selectedCategory === '' && (
+                <div className="absolute top-2 right-2 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center shadow">
+                  <span className="text-white text-[9px] font-black">✓</span>
+                </div>
+              )}
             </div>
-            <span className={`text-[10px] sm:text-xs font-bold text-center leading-tight max-w-[80px] ${
-              selectedCategory === '' ? 'text-emerald-700' : 'text-gray-700'
-            }`}>All</span>
+            <span className={`text-xs sm:text-sm font-bold text-center leading-tight ${
+              selectedCategory === '' ? 'text-emerald-700' : 'text-gray-800'
+            }`}>All Products</span>
           </button>
 
           {categories.map((cat) => {
             const isSelected = selectedCategory === cat.id;
-            const meta = categoryImageMeta[cat.slug] || { img: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=200&q=80', gradient: 'from-gray-400 to-gray-600', emoji: '📦' };
+            const meta = categoryImageMeta[cat.slug] || {
+              img: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=300&q=80',
+              gradient: 'from-gray-50 to-gray-100',
+              emoji: '📦',
+            };
             return (
               <button
                 key={cat.id}
                 onClick={() => { setSelectedCategory(cat.id); setPage(1); }}
-                className="flex-shrink-0 snap-start flex flex-col items-center gap-1.5 group focus:outline-none"
+                className="flex flex-col items-center gap-2 group focus:outline-none"
               >
-                <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden relative transition-all duration-200 ${
-                  isSelected
-                    ? 'ring-3 ring-emerald-500 ring-offset-2 shadow-lg scale-105'
-                    : 'hover:scale-105 hover:shadow-md'
-                } bg-gradient-to-br ${meta.gradient}`}>
+                <div className={`w-full aspect-square rounded-2xl overflow-hidden relative transition-all duration-200 bg-gradient-to-br ${meta.gradient} border-2 ${
+                  isSelected ? 'border-emerald-500 shadow-md scale-[1.03]' : 'border-transparent hover:border-emerald-300 hover:shadow-sm hover:scale-[1.02]'
+                }`}>
                   <img
                     src={meta.img}
                     alt={cat.name}
                     className="w-full h-full object-cover"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
-                  {/* Gradient overlay at bottom */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                  {/* Selected checkmark */}
                   {isSelected && (
-                    <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center shadow">
+                    <div className="absolute top-2 right-2 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center shadow">
                       <span className="text-white text-[9px] font-black">✓</span>
                     </div>
                   )}
                 </div>
-                <span className={`text-[10px] sm:text-xs font-bold text-center leading-tight max-w-[80px] sm:max-w-[96px] ${
-                  isSelected ? 'text-emerald-700' : 'text-gray-700'
+                <span className={`text-xs sm:text-sm font-bold text-center leading-tight ${
+                  isSelected ? 'text-emerald-700' : 'text-gray-800'
                 }`}>{cat.name}</span>
               </button>
             );
