@@ -27,8 +27,8 @@ export const ProductDetail: React.FC = () => {
   const [quantity, setQuantity] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  // Track which variant is currently selected by its ID
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
+  const [isAdding, setIsAdding] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchProductDetail = async () => {
@@ -37,7 +37,6 @@ export const ProductDetail: React.FC = () => {
       try {
         const res = await apiClient.get<Product>(`/api/v1/products/${id}`);
         setProduct(res.data);
-        // Default to first variant (smallest/cheapest)
         if (res.data.variants && res.data.variants.length > 0) {
           setSelectedVariantId(res.data.variants[0].id);
         } else {
@@ -59,7 +58,6 @@ export const ProductDetail: React.FC = () => {
     }
   }, [id]);
 
-  // Derive active variant info from selected variant ID
   const activeVariant: ProductVariantInfo | null = (() => {
     if (!product) return null;
     if (product.variants && product.variants.length > 0) {
@@ -82,7 +80,9 @@ export const ProductDetail: React.FC = () => {
       return;
     }
 
+    setIsAdding(true);
     const err = await addToCart(activeVariant.id, quantity);
+    setIsAdding(false);
     if (err) {
       alert(err);
     } else {
@@ -94,7 +94,7 @@ export const ProductDetail: React.FC = () => {
     return (
       <div className="max-w-5xl mx-auto px-4 py-16 flex flex-col items-center justify-center">
         <Loader2 className="w-12 h-12 text-emerald-600 animate-spin mb-4" />
-        <p className="text-gray-600 font-medium">Loading product details...</p>
+        <p className="text-gray-600 font-medium text-sm">Loading product details...</p>
       </div>
     );
   }
@@ -105,10 +105,10 @@ export const ProductDetail: React.FC = () => {
         <div className="bg-red-50 p-4 rounded-full inline-block text-red-500">
           <AlertTriangle className="w-12 h-12" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900">{error || 'Product not found.'}</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">{error || 'Product not found.'}</h2>
         <Link
           to="/products"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-lg transition-colors shadow-sm"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl transition-colors shadow-sm"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Catalog
@@ -122,20 +122,20 @@ export const ProductDetail: React.FC = () => {
   const hasVariants = product.variants && product.variants.length > 1;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-4 sm:space-y-6 pb-24 sm:pb-8">
       {/* Back Link */}
       <Link
         to="/products"
-        className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to Products
       </Link>
 
       {/* Main Detail Card */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sm:p-10 grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-8 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10 items-start">
         {/* Left Column: Image Display */}
-        <div className="bg-gray-50 rounded-xl p-8 flex items-center justify-center h-80 sm:h-96 relative border border-gray-100">
+        <div className="bg-gray-50 rounded-2xl p-6 flex items-center justify-center h-64 sm:h-96 relative border border-gray-100 overflow-hidden">
           {product.image_url ? (
             <img
               src={product.image_url}
@@ -146,11 +146,11 @@ export const ProductDetail: React.FC = () => {
               }}
             />
           ) : (
-            <Package className="w-28 h-28 text-gray-300" />
+            <Package className="w-20 h-20 sm:w-28 sm:h-28 text-gray-300" />
           )}
 
           {/* Return Policy Badge */}
-          <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur px-3 py-2 rounded-lg border border-gray-200 text-xs flex items-center gap-2">
+          <div className="absolute bottom-3 left-3 right-3 bg-white/90 backdrop-blur px-3 py-2 rounded-xl border border-gray-200 text-[11px] sm:text-xs flex items-center gap-2 shadow-sm">
             {product.is_returnable ? (
               <>
                 <RotateCcw className="w-4 h-4 text-emerald-600 flex-shrink-0" />
@@ -165,49 +165,49 @@ export const ProductDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column: Information & Actions */}
-        <div className="space-y-5">
+        {/* Right Column: Details & Actions */}
+        <div className="space-y-4 sm:space-y-5">
           <div>
             {/* Category & Stock Badges */}
-            <div className="flex items-center gap-3 mb-2">
-              <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="bg-emerald-100 text-emerald-800 text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded-md uppercase tracking-wider">
                 {product.category_name}
               </span>
 
               {isOutOfStock ? (
-                <span className="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">
+                <span className="bg-red-500 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">
                   Out of Stock
                 </span>
               ) : isLowStock ? (
-                <span className="bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">
+                <span className="bg-amber-500 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">
                   Low Stock ({activeVariant.quantity_available} left)
                 </span>
               ) : (
-                <span className="bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">
-                  In Stock ({activeVariant.quantity_available} available)
+                <span className="bg-emerald-600 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">
+                  In Stock ({activeVariant.quantity_available})
                 </span>
               )}
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">
+            <h1 className="text-xl sm:text-3xl font-extrabold text-gray-900 leading-tight">
               {product.name}
             </h1>
-            <p className="text-xs text-gray-400 mt-1">SKU: {activeVariant.sku}</p>
+            <p className="text-[11px] sm:text-xs text-gray-400 mt-1">SKU: {activeVariant.sku}</p>
           </div>
 
           {/* Price Header */}
-          <div className="border-y border-gray-100 py-4 flex items-baseline gap-2">
-            <span className="text-3xl font-black text-gray-900">
+          <div className="border-y border-gray-100 py-3 sm:py-4 flex items-baseline gap-2">
+            <span className="text-2xl sm:text-3xl font-black text-gray-900">
               ₹{Number(activeVariant.price).toFixed(2)}
             </span>
-            <span className="text-sm font-medium text-gray-500">per {activeVariant.unit}</span>
+            <span className="text-xs sm:text-sm font-medium text-gray-500">per {activeVariant.unit}</span>
           </div>
 
-          {/* Variant Selector (Blinkit-style pack size chips) */}
+          {/* Pack Size Variant Selector */}
           {hasVariants && (
             <div>
               <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                Pack Size
+                Pack Size Option
               </h3>
               <div className="flex flex-wrap gap-2">
                 {product.variants!.map((variant) => {
@@ -219,16 +219,16 @@ export const ProductDetail: React.FC = () => {
                         setSelectedVariantId(variant.id);
                         setQuantity(1);
                       }}
-                      className={`flex flex-col items-start px-3 py-2 rounded-lg border-2 text-left transition-all ${
+                      className={`flex flex-col items-start px-3 py-2 rounded-xl border-2 text-left transition-all ${
                         isActive
-                          ? 'border-emerald-600 bg-emerald-50'
+                          ? 'border-emerald-600 bg-emerald-50 shadow-sm'
                           : 'border-gray-200 bg-white hover:border-emerald-300'
                       }`}
                     >
-                      <span className={`text-sm font-bold ${isActive ? 'text-emerald-700' : 'text-gray-800'}`}>
+                      <span className={`text-xs sm:text-sm font-bold ${isActive ? 'text-emerald-700' : 'text-gray-800'}`}>
                         {variant.unit}
                       </span>
-                      <span className={`text-xs font-semibold ${isActive ? 'text-emerald-600' : 'text-gray-500'}`}>
+                      <span className={`text-[11px] sm:text-xs font-semibold ${isActive ? 'text-emerald-600' : 'text-gray-500'}`}>
                         ₹{Number(variant.price).toFixed(0)}
                       </span>
                     </button>
@@ -241,64 +241,99 @@ export const ProductDetail: React.FC = () => {
           {/* Product Description */}
           {product.description && (
             <div>
-              <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+              <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
                 Description
               </h3>
-              <p className="text-sm text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-100">
+              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed bg-gray-50 p-3.5 rounded-xl border border-gray-100">
                 {product.description}
               </p>
             </div>
           )}
 
-          {/* Quantity Selector */}
-          {!isOutOfStock && (
-            <div className="space-y-3 pt-2">
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
-                Quantity
-              </label>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-gray-50">
-                  <button
-                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    disabled={quantity <= 1}
-                    className="p-2.5 text-gray-600 hover:bg-gray-200 disabled:opacity-40 transition-colors"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </button>
-                  <span className="px-5 font-bold text-gray-900 text-base min-w-[3rem] text-center">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() =>
-                      setQuantity((q) => Math.min(activeVariant.quantity_available, q + 1))
-                    }
-                    disabled={quantity >= activeVariant.quantity_available}
-                    className="p-2.5 text-gray-600 hover:bg-gray-200 disabled:opacity-40 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-                <span className="text-xs text-gray-500">
-                  Max available: {activeVariant.quantity_available}
+          {/* Desktop Quantity & Add to Cart Section */}
+          <div className="hidden sm:block pt-4 space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden bg-white shadow-sm">
+                <button
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  disabled={quantity <= 1 || isOutOfStock}
+                  className="p-2.5 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Minus className="w-4 h-4 text-gray-700" />
+                </button>
+                <span className="px-4 font-bold text-sm text-gray-900 min-w-[2.5rem] text-center">
+                  {quantity}
                 </span>
+                <button
+                  onClick={() => setQuantity((q) => Math.min(activeVariant.quantity_available, q + 1))}
+                  disabled={quantity >= activeVariant.quantity_available || isOutOfStock}
+                  className="p-2.5 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Plus className="w-4 h-4 text-gray-700" />
+                </button>
               </div>
-            </div>
-          )}
 
-          {/* Add to Cart Button */}
+              <button
+                onClick={handleAddToCart}
+                disabled={isOutOfStock || isAdding}
+                className={`flex-grow py-3 px-6 rounded-xl font-extrabold text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 ${
+                  isOutOfStock
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
+                    : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
+                }`}
+              >
+                {isAdding ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <ShoppingBag className="w-5 h-5" />
+                    <span>{isOutOfStock ? 'Sold Out' : `Add to Cart • ₹${(Number(activeVariant.price) * quantity).toFixed(0)}`}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Sticky Bottom Add-to-Cart Action Bar (< 640px) */}
+      <div className="sm:hidden fixed bottom-14 left-0 right-0 z-30 bg-white/95 backdrop-blur border-t border-gray-200 p-3 flex items-center gap-3 shadow-2xl">
+        <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden bg-white">
           <button
-            onClick={handleAddToCart}
-            disabled={isOutOfStock}
-            className={`w-full py-3.5 px-6 rounded-xl font-bold text-base flex items-center justify-center gap-3 shadow-md transition-all ${
-              isOutOfStock
-                ? 'bg-gray-200 text-gray-400 cursor-not-allowed border border-gray-300'
-                : 'bg-emerald-600 hover:bg-emerald-700 text-white active:scale-98'
-            }`}
+            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+            disabled={quantity <= 1 || isOutOfStock}
+            className="p-2 text-gray-700 disabled:opacity-30"
           >
-            <ShoppingBag className="w-5 h-5" />
-            {isOutOfStock ? 'Currently Unavailable' : 'Add to Cart'}
+            <Minus className="w-4 h-4" />
+          </button>
+          <span className="px-2.5 font-bold text-xs text-gray-900">{quantity}</span>
+          <button
+            onClick={() => setQuantity((q) => Math.min(activeVariant.quantity_available, q + 1))}
+            disabled={quantity >= activeVariant.quantity_available || isOutOfStock}
+            className="p-2 text-gray-700 disabled:opacity-30"
+          >
+            <Plus className="w-4 h-4" />
           </button>
         </div>
+
+        <button
+          onClick={handleAddToCart}
+          disabled={isOutOfStock || isAdding}
+          className={`flex-grow py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 ${
+            isOutOfStock
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-emerald-600 text-white'
+          }`}
+        >
+          {isAdding ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <>
+              <ShoppingBag className="w-4 h-4" />
+              <span>{isOutOfStock ? 'Sold Out' : `Add • ₹${(Number(activeVariant.price) * quantity).toFixed(0)}`}</span>
+            </>
+          )}
+        </button>
       </div>
     </div>
   );

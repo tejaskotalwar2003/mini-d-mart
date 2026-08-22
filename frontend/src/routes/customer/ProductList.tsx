@@ -15,11 +15,11 @@ import {
   AlertTriangle,
   Package,
   Plus,
+  SlidersHorizontal,
+  X,
 } from 'lucide-react';
 
-// Per-card selected variant state keyed by base product id
 type SelectedVariants = Record<string, ProductVariantInfo>;
-
 
 export const ProductList: React.FC = () => {
   const { user } = useAuth();
@@ -33,8 +33,10 @@ export const ProductList: React.FC = () => {
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  // Tracks the selected variant (unit/size) per product card
   const [selectedVariants, setSelectedVariants] = useState<SelectedVariants>({});
+
+  // Mobile Filter Sheet open state
+  const [mobileFilterOpen, setMobileFilterOpen] = useState<boolean>(false);
 
   // Filter states
   const [search, setSearch] = useState<string>('');
@@ -44,15 +46,14 @@ export const ProductList: React.FC = () => {
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('newest');
   const [page, setPage] = useState<number>(1);
-  const pageSize = 8;
+  const pageSize = 12;
 
-  // Debounce search input (~400ms)
+  // Debounce search (~400ms)
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search);
-      setPage(1); // Reset page on search change
+      setPage(1);
     }, 400);
-
     return () => clearTimeout(handler);
   }, [search]);
 
@@ -69,7 +70,7 @@ export const ProductList: React.FC = () => {
     fetchCategories();
   }, []);
 
-  // Fetch Products whenever filters/pagination change
+  // Fetch Products
   const fetchProducts = async () => {
     setIsLoading(true);
     setError(null);
@@ -107,6 +108,7 @@ export const ProductList: React.FC = () => {
     setMaxPrice('');
     setSortBy('newest');
     setPage(1);
+    setMobileFilterOpen(false);
   };
 
   const handleAddToCart = async (product: Product, e: React.MouseEvent) => {
@@ -136,62 +138,68 @@ export const ProductList: React.FC = () => {
     'household-essentials': '🧼',
   };
 
+  const activeFilterCount =
+    (debouncedSearch ? 1 : 0) +
+    (selectedCategory ? 1 : 0) +
+    (minPrice || maxPrice ? 1 : 0) +
+    (sortBy !== 'newest' ? 1 : 0);
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      {/* Promotional Offer Banners Grid (Blinkit style) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
+      {/* Promotional Offer Banners (Swipeable Carousel on Mobile, Grid on Desktop) */}
+      <div className="flex md:grid md:grid-cols-3 gap-3 sm:gap-4 overflow-x-auto pb-2 md:pb-0 scrollbar-none snap-x snap-mandatory">
         {/* Banner 1 */}
-        <div className="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl p-5 text-white shadow-md relative overflow-hidden flex flex-col justify-between h-36">
+        <div className="min-w-[85%] sm:min-w-[70%] md:min-w-0 snap-center bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl p-4 sm:p-5 text-white shadow-md relative overflow-hidden flex flex-col justify-between h-32 sm:h-36 flex-shrink-0">
           <div className="relative z-10">
             <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
               10-Min Delivery
             </span>
-            <h2 className="text-lg font-black mt-1 leading-snug">Superfast Grocery Delivery</h2>
-            <p className="text-emerald-100 text-xs mt-0.5">Fresh produce & daily essentials at wholesale rates</p>
+            <h2 className="text-base sm:text-lg font-black mt-1 leading-snug">Superfast Grocery Delivery</h2>
+            <p className="text-emerald-100 text-[11px] sm:text-xs mt-0.5">Fresh produce at wholesale rates</p>
           </div>
           <div className="relative z-10 flex items-center justify-between">
-            <span className="text-[11px] font-bold text-yellow-300">⚡ Zero Delivery Fee on ₹199+</span>
+            <span className="text-[11px] font-bold text-yellow-300">⚡ Free Delivery on ₹199+</span>
           </div>
-          <ShoppingBag className="absolute right-2 -bottom-2 w-28 h-28 text-white/10 pointer-events-none" />
+          <ShoppingBag className="absolute right-2 -bottom-2 w-24 h-24 sm:w-28 sm:h-28 text-white/10 pointer-events-none" />
         </div>
 
         {/* Banner 2 */}
-        <div className="bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl p-5 text-white shadow-md relative overflow-hidden flex flex-col justify-between h-36">
+        <div className="min-w-[85%] sm:min-w-[70%] md:min-w-0 snap-center bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl p-4 sm:p-5 text-white shadow-md relative overflow-hidden flex flex-col justify-between h-32 sm:h-36 flex-shrink-0">
           <div className="relative z-10">
             <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
               Festive Deals
             </span>
-            <h2 className="text-lg font-black mt-1 leading-snug">Up to 40% OFF Munchies</h2>
-            <p className="text-amber-100 text-xs mt-0.5">Chips, cold drinks, biscuits & confectionery</p>
+            <h2 className="text-base sm:text-lg font-black mt-1 leading-snug">Up to 40% OFF Munchies</h2>
+            <p className="text-amber-100 text-[11px] sm:text-xs mt-0.5">Chips, drinks & confectionery</p>
           </div>
           <div className="relative z-10 flex items-center justify-between">
             <span className="text-[11px] font-bold text-yellow-100">🎉 Grab Big Pack Combos</span>
           </div>
-          <Package className="absolute right-2 -bottom-2 w-28 h-28 text-white/10 pointer-events-none" />
+          <Package className="absolute right-2 -bottom-2 w-24 h-24 sm:w-28 sm:h-28 text-white/10 pointer-events-none" />
         </div>
 
         {/* Banner 3 */}
-        <div className="bg-gradient-to-r from-cyan-600 to-blue-700 rounded-2xl p-5 text-white shadow-md relative overflow-hidden flex flex-col justify-between h-36">
+        <div className="min-w-[85%] sm:min-w-[70%] md:min-w-0 snap-center bg-gradient-to-r from-cyan-600 to-blue-700 rounded-2xl p-4 sm:p-5 text-white shadow-md relative overflow-hidden flex flex-col justify-between h-32 sm:h-36 flex-shrink-0">
           <div className="relative z-10">
             <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
               Fresh Farm Harvest
             </span>
-            <h2 className="text-lg font-black mt-1 leading-snug">Organic Fruits & Veggies</h2>
-            <p className="text-cyan-100 text-xs mt-0.5">Handpicked farm produce washed & packed safely</p>
+            <h2 className="text-base sm:text-lg font-black mt-1 leading-snug">Organic Fruits & Veggies</h2>
+            <p className="text-cyan-100 text-[11px] sm:text-xs mt-0.5">Handpicked farm produce</p>
           </div>
           <div className="relative z-10 flex items-center justify-between">
             <span className="text-[11px] font-bold text-emerald-200">🌿 100% Quality Guaranteed</span>
           </div>
-          <ShoppingBag className="absolute right-2 -bottom-2 w-28 h-28 text-white/10 pointer-events-none" />
+          <ShoppingBag className="absolute right-2 -bottom-2 w-24 h-24 sm:w-28 sm:h-28 text-white/10 pointer-events-none" />
         </div>
       </div>
 
-      {/* Blinkit Top Category Quick Navigation Strip */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-extrabold text-gray-900 uppercase tracking-wider flex items-center gap-1.5">
+      {/* Top Category Quick Navigation Strip */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-3 sm:p-4 shadow-sm">
+        <div className="flex items-center justify-between mb-2 sm:mb-3">
+          <h2 className="text-xs sm:text-sm font-extrabold text-gray-900 uppercase tracking-wider flex items-center gap-1.5">
             <span>Explore Categories</span>
-            <span className="text-xs text-gray-400 font-medium lowercase">({categories.length} departments)</span>
+            <span className="text-[11px] text-gray-400 font-medium lowercase">({categories.length} depts)</span>
           </h2>
           {selectedCategory && (
             <button
@@ -205,13 +213,13 @@ export const ProductList: React.FC = () => {
             </button>
           )}
         </div>
-        <div className="flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-thin">
+        <div className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto pb-1 scrollbar-thin">
           <button
             onClick={() => {
               setSelectedCategory('');
               setPage(1);
             }}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
               selectedCategory === ''
                 ? 'bg-emerald-600 text-white shadow-sm'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -230,7 +238,7 @@ export const ProductList: React.FC = () => {
                   setSelectedCategory(cat.id);
                   setPage(1);
                 }}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                   isSelected
                     ? 'bg-emerald-600 text-white shadow-sm'
                     : 'bg-gray-50 border border-gray-200 text-gray-700 hover:bg-emerald-50 hover:border-emerald-300'
@@ -244,16 +252,44 @@ export const ProductList: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Content Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Sidebar Filters (Desktop & Mobile Dropdown) */}
-        <div className="space-y-6 bg-white p-5 rounded-xl border border-gray-200 shadow-sm h-fit">
+      {/* Mobile Search & Filter Action Bar (< 1024px) */}
+      <div className="lg:hidden flex items-center gap-2">
+        <div className="relative flex-grow">
+          <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search mangoes, milk, tea..."
+            className="w-full pl-9 pr-3 py-2 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors shadow-sm"
+          />
+        </div>
+        <button
+          onClick={() => setMobileFilterOpen(true)}
+          className={`relative p-2.5 rounded-xl border font-bold text-xs flex items-center gap-1.5 shadow-sm transition-colors ${
+            activeFilterCount > 0
+              ? 'bg-emerald-600 text-white border-emerald-600'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+          }`}
+          title="Open Filters"
+        >
+          <SlidersHorizontal className="w-4 h-4" />
+          {activeFilterCount > 0 && (
+            <span className="w-2 h-2 rounded-full bg-amber-400 absolute top-1.5 right-1.5"></span>
+          )}
+        </button>
+      </div>
+
+      {/* Main Content Layout (Sidebar on Desktop + Product Grid) */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8 items-start">
+        {/* Desktop Sidebar Filters (Hidden on Mobile) */}
+        <div className="hidden lg:block space-y-6 bg-white p-5 rounded-2xl border border-gray-200 shadow-sm sticky top-20">
           <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-            <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <Filter className="w-5 h-5 text-emerald-600" />
+            <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+              <Filter className="w-4 h-4 text-emerald-600" />
               Filters
             </h2>
-            {(search || selectedCategory || minPrice || maxPrice || sortBy !== 'newest') && (
+            {activeFilterCount > 0 && (
               <button
                 onClick={handleClearFilters}
                 className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition-colors"
@@ -264,7 +300,7 @@ export const ProductList: React.FC = () => {
             )}
           </div>
 
-          {/* Search Input */}
+          {/* Search */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
               Search Products
@@ -281,7 +317,7 @@ export const ProductList: React.FC = () => {
             </div>
           </div>
 
-          {/* Category Filter */}
+          {/* Category */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
               Category
@@ -318,7 +354,7 @@ export const ProductList: React.FC = () => {
                   setPage(1);
                 }}
                 placeholder="Min ₹"
-                className="w-full py-1.5 px-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                className="w-full py-2 px-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
               />
               <input
                 type="number"
@@ -329,25 +365,25 @@ export const ProductList: React.FC = () => {
                   setPage(1);
                 }}
                 placeholder="Max ₹"
-                className="w-full py-1.5 px-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                className="w-full py-2 px-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
               />
             </div>
           </div>
         </div>
 
-        {/* Product Grid & Controls Column */}
-        <div className="lg:col-span-3 space-y-6">
-          {/* Top Control Bar: Total Count & Sort Dropdown */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-            <p className="text-sm text-gray-600 font-medium">
-              Showing <span className="font-bold text-gray-900">{products.length}</span> of{' '}
-              <span className="font-bold text-gray-900">{total}</span> products
-            </p>
+        {/* Product Catalog Grid Column */}
+        <div className="lg:col-span-3 space-y-4 sm:space-y-6">
+          {/* Top Bar: Results Count & Sort Dropdown */}
+          <div className="bg-white p-3 sm:p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+            <div className="text-xs sm:text-sm font-semibold text-gray-700">
+              Showing <span className="text-emerald-700 font-extrabold">{products.length}</span> of{' '}
+              <span className="text-gray-900 font-extrabold">{total}</span> products
+            </div>
 
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <ArrowUpDown className="w-4 h-4 text-gray-500" />
-              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                Sort By:
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
+                <ArrowUpDown className="w-3.5 h-3.5" />
+                Sort:
               </span>
               <select
                 value={sortBy}
@@ -355,7 +391,7 @@ export const ProductList: React.FC = () => {
                   setSortBy(e.target.value);
                   setPage(1);
                 }}
-                className="py-1.5 px-3 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors w-full sm:w-auto"
+                className="py-1.5 px-3 border border-gray-300 rounded-lg text-xs sm:text-sm bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors w-full sm:w-auto font-medium"
               >
                 <option value="newest">Newest Arrivals</option>
                 <option value="price_asc">Price: Low to High</option>
@@ -368,37 +404,37 @@ export const ProductList: React.FC = () => {
           {/* Product Grid / States */}
           {isLoading ? (
             // Skeleton Loader Grid
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div
                   key={i}
-                  className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm animate-pulse space-y-3"
+                  className="bg-white rounded-xl p-3 sm:p-4 border border-gray-200 shadow-sm animate-pulse space-y-2 sm:space-y-3"
                 >
-                  <div className="bg-gray-200 h-40 rounded-lg w-full"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                  <div className="h-8 bg-gray-200 rounded w-full mt-4"></div>
+                  <div className="bg-gray-200 h-28 sm:h-40 rounded-lg w-full"></div>
+                  <div className="h-3 sm:h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-3 sm:h-4 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-7 sm:h-8 bg-gray-200 rounded w-full mt-2"></div>
                 </div>
               ))}
             </div>
           ) : error ? (
             // Error State
-            <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center space-y-4">
-              <AlertTriangle className="w-12 h-12 text-red-500 mx-auto" />
-              <h3 className="text-lg font-bold text-gray-900">{error}</h3>
+            <div className="bg-red-50 border border-red-200 rounded-2xl p-6 sm:p-8 text-center space-y-4">
+              <AlertTriangle className="w-10 h-10 sm:w-12 sm:h-12 text-red-500 mx-auto" />
+              <h3 className="text-base sm:text-lg font-bold text-gray-900">{error}</h3>
               <button
                 onClick={fetchProducts}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold text-sm rounded-lg transition-colors"
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold text-sm rounded-lg transition-colors shadow-sm"
               >
                 Retry Request
               </button>
             </div>
           ) : products.length === 0 ? (
             // Empty State
-            <div className="bg-white border border-gray-200 rounded-xl p-12 text-center space-y-4">
-              <Package className="w-16 h-16 text-gray-300 mx-auto" />
-              <h3 className="text-xl font-bold text-gray-800">No Products Found</h3>
-              <p className="text-sm text-gray-500 max-w-sm mx-auto">
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 sm:p-12 text-center space-y-4">
+              <Package className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto" />
+              <h3 className="text-lg sm:text-xl font-bold text-gray-800">No Products Found</h3>
+              <p className="text-xs sm:text-sm text-gray-500 max-w-sm mx-auto">
                 We couldn't find any products matching your filters. Try clearing your search or price range.
               </p>
               <button
@@ -410,10 +446,9 @@ export const ProductList: React.FC = () => {
               </button>
             </div>
           ) : (
-            // Responsive Product Grid
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+            // 2-Column Mobile / 4-Column Desktop Product Grid
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
               {products.map((product) => {
-                // Determine active variant for this card
                 const activeVariant: ProductVariantInfo =
                   selectedVariants[product.id] ??
                   (product.variants && product.variants.length > 0
@@ -427,64 +462,66 @@ export const ProductList: React.FC = () => {
                 return (
                   <div
                     key={product.id}
-                    className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden group"
+                    className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden group"
                   >
-                    <Link to={`/products/${activeVariant.id}`} className="block relative p-4">
+                    <Link to={`/products/${activeVariant.id}`} className="block relative p-2.5 sm:p-4">
                       {/* Stock Badge */}
-                      <div className="absolute top-3 left-3 z-10">
+                      <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10">
                         {isOutOfStock ? (
-                          <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                          <span className="bg-red-500 text-white text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md uppercase tracking-wider">
                             Out of Stock
                           </span>
                         ) : isLowStock ? (
-                          <span className="bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                            Low Stock ({activeVariant.quantity_available})
+                          <span className="bg-amber-500 text-white text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md uppercase tracking-wider">
+                            Low ({activeVariant.quantity_available})
                           </span>
                         ) : (
-                          <span className="bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                          <span className="bg-emerald-600 text-white text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md uppercase tracking-wider">
                             In Stock
                           </span>
                         )}
                       </div>
 
                       {/* Product Image */}
-                      <div className="w-full h-44 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden mb-3 group-hover:scale-105 transition-transform duration-300">
+                      <div className="w-full h-28 sm:h-44 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden mb-2 sm:mb-3 group-hover:scale-105 transition-transform duration-300">
                         {product.image_url ? (
                           <img
                             src={product.image_url}
                             alt={product.name}
-                            className="w-full h-full object-contain p-2"
+                            className="w-full h-full object-contain p-1.5 sm:p-2"
                             onError={(e) => {
                               (e.target as HTMLElement).style.display = 'none';
                             }}
                           />
                         ) : (
-                          <Package className="w-16 h-16 text-gray-300" />
+                          <Package className="w-10 h-10 sm:w-16 sm:h-16 text-gray-300" />
                         )}
                       </div>
 
                       {/* Category Badge */}
-                      <span className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider">
+                      <span className="text-[10px] sm:text-[11px] font-bold text-emerald-600 uppercase tracking-wider line-clamp-1">
                         {product.category_name}
                       </span>
 
                       {/* Product Name */}
-                      <h3 className="font-bold text-gray-900 text-sm line-clamp-2 mt-1 min-h-[2.5rem] group-hover:text-emerald-600 transition-colors">
+                      <h3 className="font-bold text-gray-900 text-xs sm:text-sm line-clamp-2 mt-0.5 min-h-[2rem] sm:min-h-[2.5rem] group-hover:text-emerald-600 transition-colors">
                         {product.name}
                       </h3>
 
                       {/* Price & Unit */}
-                      <div className="mt-2 flex items-baseline gap-1">
-                        <span className="text-lg font-extrabold text-gray-900">
+                      <div className="mt-1.5 sm:mt-2 flex items-baseline gap-1">
+                        <span className="text-base sm:text-lg font-extrabold text-gray-900">
                           ₹{Number(activeVariant.price).toFixed(0)}
                         </span>
-                        <span className="text-xs text-gray-400 font-medium">/ {activeVariant.unit}</span>
+                        <span className="text-[10px] sm:text-xs text-gray-400 font-medium truncate">
+                          / {activeVariant.unit}
+                        </span>
                       </div>
                     </Link>
 
                     {/* Variant Chips (Blinkit-style) */}
                     {hasVariants && (
-                      <div className="px-4 pb-2 flex flex-wrap gap-1.5">
+                      <div className="px-2.5 sm:px-4 pb-2 flex flex-wrap gap-1">
                         {product.variants!.map((variant) => {
                           const isActive = activeVariant.id === variant.id;
                           return (
@@ -494,7 +531,7 @@ export const ProductList: React.FC = () => {
                                 setSelectedVariants((prev) => ({ ...prev, [product.id]: variant }))
                               }
                               title={`₹${Number(variant.price).toFixed(0)} / ${variant.unit}`}
-                              className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border transition-all ${
+                              className={`text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded border transition-all ${
                                 isActive
                                   ? 'bg-emerald-600 text-white border-emerald-600'
                                   : 'bg-white text-gray-600 border-gray-300 hover:border-emerald-400 hover:text-emerald-600'
@@ -508,21 +545,27 @@ export const ProductList: React.FC = () => {
                     )}
 
                     {/* Add to Cart Button */}
-                    <div className="p-4 pt-2">
+                    <div className="p-2.5 sm:p-4 pt-1 sm:pt-2">
                       <button
                         onClick={(e) => {
-                          const variantProduct = { ...product, id: activeVariant.id, price: activeVariant.price, unit: activeVariant.unit, quantity_available: activeVariant.quantity_available };
+                          const variantProduct = {
+                            ...product,
+                            id: activeVariant.id,
+                            price: activeVariant.price,
+                            unit: activeVariant.unit,
+                            quantity_available: activeVariant.quantity_available,
+                          };
                           handleAddToCart(variantProduct, e);
                         }}
                         disabled={isOutOfStock}
-                        className={`w-full py-2.5 px-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-sm ${
+                        className={`w-full py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1 sm:gap-2 transition-all shadow-sm ${
                           isOutOfStock
                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
                             : 'bg-emerald-600 hover:bg-emerald-700 text-white active:scale-95'
                         }`}
                       >
-                        <Plus className="w-4 h-4" />
-                        {isOutOfStock ? 'Unavailable' : 'Add to Cart'}
+                        <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                        <span>{isOutOfStock ? 'Sold Out' : 'ADD'}</span>
                       </button>
                     </div>
                   </div>
@@ -531,36 +574,143 @@ export const ProductList: React.FC = () => {
             </div>
           )}
 
-          {/* Pagination Bar */}
-          {!isLoading && !error && products.length > 0 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-              <p className="text-sm text-gray-600">
-                Page <span className="font-bold text-gray-900">{page}</span> of{' '}
-                <span className="font-bold text-gray-900">{totalPages}</span>
-              </p>
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 pt-4 sm:pt-6">
+              <button
+                onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                disabled={page === 1}
+                className="p-2 rounded-xl border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition-colors"
+                aria-label="Previous Page"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={page === 1}
-                  className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 transition-colors"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  Previous
-                </button>
-                <button
-                  onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-                  disabled={page >= totalPages}
-                  className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 transition-colors"
-                >
-                  Next
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
+              <span className="text-xs sm:text-sm font-bold text-gray-700 px-3">
+                Page {page} of {totalPages}
+              </span>
+
+              <button
+                onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+                disabled={page === totalPages}
+                className="p-2 rounded-xl border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition-colors"
+                aria-label="Next Page"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
             </div>
           )}
         </div>
       </div>
+
+      {/* Mobile Slide-Up Filter Drawer Modal */}
+      {mobileFilterOpen && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-lg p-5 space-y-5 max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+              <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                <Filter className="w-4 h-4 text-emerald-600" />
+                Filter & Sort
+              </h2>
+              <button
+                onClick={() => setMobileFilterOpen(false)}
+                className="p-1.5 text-gray-400 hover:text-gray-700 rounded-full hover:bg-gray-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Category Filter */}
+            <div>
+              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                Category
+              </label>
+              <select
+                value={selectedCategory}
+                onChange={(e) => {
+                  setSelectedCategory(e.target.value);
+                  setPage(1);
+                }}
+                className="w-full py-2.5 px-3 border border-gray-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-medium"
+              >
+                <option value="">All Categories</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Price Range */}
+            <div>
+              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                Price Range (₹)
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  type="number"
+                  min="0"
+                  value={minPrice}
+                  onChange={(e) => {
+                    setMinPrice(e.target.value);
+                    setPage(1);
+                  }}
+                  placeholder="Min ₹"
+                  className="w-full py-2.5 px-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                />
+                <input
+                  type="number"
+                  min="0"
+                  value={maxPrice}
+                  onChange={(e) => {
+                    setMaxPrice(e.target.value);
+                    setPage(1);
+                  }}
+                  placeholder="Max ₹"
+                  className="w-full py-2.5 px-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                />
+              </div>
+            </div>
+
+            {/* Sort Filter */}
+            <div>
+              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                Sort Products
+              </label>
+              <select
+                value={sortBy}
+                onChange={(e) => {
+                  setSortBy(e.target.value);
+                  setPage(1);
+                }}
+                className="w-full py-2.5 px-3 border border-gray-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-medium"
+              >
+                <option value="newest">Newest Arrivals</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+                <option value="name">Name: A to Z</option>
+              </select>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3 pt-3 border-t border-gray-100">
+              <button
+                onClick={handleClearFilters}
+                className="flex-1 py-3 px-4 rounded-xl border border-gray-300 text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Reset All
+              </button>
+              <button
+                onClick={() => setMobileFilterOpen(false)}
+                className="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs font-bold text-white shadow-md transition-colors"
+              >
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
