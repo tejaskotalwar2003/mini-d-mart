@@ -179,11 +179,6 @@ export const ProductList: React.FC = () => {
   };
 
   const categoryImageMeta: Record<string, { img: string; gradient: string; emoji: string }> = {
-    'raksha-bandhan-gifts': {
-      img: 'https://images.unsplash.com/photo-1629814249584-b40c3cb4d75d?auto=format&fit=crop&w=300&q=80',
-      gradient: 'from-rose-100 via-pink-100 to-amber-100 ring-2 ring-rose-400/40',
-      emoji: '🪢',
-    },
     'fruits-vegetables': {
       img: 'https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&w=300&q=80',
       gradient: 'from-green-50 to-emerald-100',
@@ -219,6 +214,24 @@ export const ProductList: React.FC = () => {
       gradient: 'from-cyan-50 to-sky-100',
       emoji: '🧼',
     },
+    'raksha-bandhan': {
+      img: 'https://images.unsplash.com/photo-1513201099705-a9746072f579?auto=format&fit=crop&w=300&q=80',
+      gradient: 'from-rose-50 to-amber-100',
+      emoji: '🪢',
+    },
+  };
+
+  // Helper: get the Raksha Bandhan category ID from the fetched categories list
+  const rakhiCategory = categories.find((c) => c.slug === 'raksha-bandhan');
+  const handleBannerClick = () => {
+    if (rakhiCategory) {
+      setSelectedCategory(rakhiCategory.id);
+      setPage(1);
+      // Scroll to product grid
+      setTimeout(() => {
+        document.getElementById('product-grid-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 150);
+    }
   };
 
   const activeFilterCount =
@@ -246,20 +259,12 @@ export const ProductList: React.FC = () => {
         </div>
       </div>
 
-      {/* Promotional Festive Banners (Raksha Bandhan Theme, Swipeable on Mobile, Clickable) */}
+      {/* Promotional Festive Banners (Raksha Bandhan Theme, Swipeable on Mobile) */}
       <div className="flex md:grid md:grid-cols-3 gap-3 sm:gap-4 overflow-x-auto pb-2 md:pb-0 scrollbar-none snap-x snap-mandatory">
         {/* Banner 1: Rakhi Special */}
-        <div
-          onClick={() => {
-            const rakhiCat = categories.find((c) => c.slug === 'raksha-bandhan-gifts');
-            if (rakhiCat) {
-              setSelectedCategory(rakhiCat.id);
-            } else {
-              setSearch('rakhi');
-            }
-            setPage(1);
-          }}
-          className="min-w-[85%] sm:min-w-[70%] md:min-w-0 snap-center bg-gradient-to-r from-rose-700 via-pink-700 to-amber-700 rounded-2xl p-4 sm:p-5 text-white shadow-lg relative overflow-hidden flex flex-col justify-between h-36 sm:h-40 flex-shrink-0 border border-rose-400/30 cursor-pointer hover:scale-[1.02] transition-transform group"
+        <button
+          onClick={handleBannerClick}
+          className="min-w-[85%] sm:min-w-[70%] md:min-w-0 snap-center bg-gradient-to-r from-rose-700 via-pink-700 to-amber-700 rounded-2xl p-4 sm:p-5 text-white shadow-lg relative overflow-hidden flex flex-col justify-between h-36 sm:h-40 flex-shrink-0 border border-rose-400/30 cursor-pointer hover:opacity-95 active:scale-[0.98] transition-all text-left focus:outline-none focus:ring-2 focus:ring-amber-400"
         >
           <div className="relative z-10">
             <div className="flex items-center gap-1.5">
@@ -270,26 +275,26 @@ export const ProductList: React.FC = () => {
                 Flat 30% OFF
               </span>
             </div>
-            <h2 className="text-base sm:text-xl font-black mt-1.5 leading-snug drop-shadow-sm group-hover:text-amber-200 transition-colors">
-              Designer Rakhis & Thalis
+            <h2 className="text-base sm:text-xl font-black mt-1.5 leading-snug drop-shadow-sm">
+              Designer Rakhis &amp; Thalis
             </h2>
             <p className="text-rose-100 text-[11px] sm:text-xs mt-0.5">
-              Silver, thread, zardosi & cartoon sets with Roli-Chawal
+              Silver, thread, zardosi &amp; cartoon sets with Roli-Chawal
             </p>
           </div>
           <div className="relative z-10 flex items-center justify-between">
-            <span className="text-xs font-black text-amber-300">⚡ Starting from ₹29 · Explore ➔</span>
+            <span className="text-xs font-black text-amber-300">⚡ Starting from ₹29 · 10m Delivery</span>
+            <span className="flex items-center gap-1 text-[11px] font-black bg-white/20 px-2.5 py-1 rounded-full">
+              Shop Now <ArrowRight className="w-3 h-3" />
+            </span>
           </div>
-          <Gift className="absolute right-2 -bottom-2 w-28 h-28 text-white/10 pointer-events-none group-hover:scale-110 transition-transform" />
-        </div>
+          <Gift className="absolute right-2 -bottom-2 w-28 h-28 text-white/10 pointer-events-none" />
+        </button>
 
         {/* Banner 2: Festive Sweets & Mithai */}
-        <div
-          onClick={() => {
-            setSearch('kaju katli');
-            setPage(1);
-          }}
-          className="min-w-[85%] sm:min-w-[70%] md:min-w-0 snap-center bg-gradient-to-r from-amber-600 via-yellow-600 to-orange-700 rounded-2xl p-4 sm:p-5 text-white shadow-lg relative overflow-hidden flex flex-col justify-between h-36 sm:h-40 flex-shrink-0 border border-amber-400/30 cursor-pointer hover:scale-[1.02] transition-transform group"
+        <button
+          onClick={handleBannerClick}
+          className="min-w-[85%] sm:min-w-[70%] md:min-w-0 snap-center bg-gradient-to-r from-amber-600 via-yellow-600 to-orange-700 rounded-2xl p-4 sm:p-5 text-white shadow-lg relative overflow-hidden flex flex-col justify-between h-36 sm:h-40 flex-shrink-0 border border-amber-400/30 cursor-pointer hover:opacity-95 active:scale-[0.98] transition-all text-left focus:outline-none focus:ring-2 focus:ring-yellow-400"
         >
           <div className="relative z-10">
             <div className="flex items-center gap-1.5">
@@ -300,26 +305,26 @@ export const ProductList: React.FC = () => {
                 Up to 40% OFF
               </span>
             </div>
-            <h2 className="text-base sm:text-xl font-black mt-1.5 leading-snug drop-shadow-sm group-hover:text-yellow-200 transition-colors">
-              Fresh Kaju Katli & Ladoos
+            <h2 className="text-base sm:text-xl font-black mt-1.5 leading-snug drop-shadow-sm">
+              Fresh Kaju Katli &amp; Ladoos
             </h2>
             <p className="text-amber-100 text-[11px] sm:text-xs mt-0.5">
-              Haldiram's, Bikaji & freshly packed pure ghee sweets
+              Haldiram's, Bikaji &amp; freshly packed pure ghee sweets
             </p>
           </div>
           <div className="relative z-10 flex items-center justify-between">
-            <span className="text-xs font-black text-yellow-100">🎉 Pure Ghee Sweets · Explore ➔</span>
+            <span className="text-xs font-black text-yellow-100">🎉 Pure Ghee Assortments</span>
+            <span className="flex items-center gap-1 text-[11px] font-black bg-white/20 px-2.5 py-1 rounded-full">
+              Shop Now <ArrowRight className="w-3 h-3" />
+            </span>
           </div>
-          <Package className="absolute right-2 -bottom-2 w-28 h-28 text-white/10 pointer-events-none group-hover:scale-110 transition-transform" />
-        </div>
+          <Package className="absolute right-2 -bottom-2 w-28 h-28 text-white/10 pointer-events-none" />
+        </button>
 
         {/* Banner 3: Cadbury Celebrations & Hampers */}
-        <div
-          onClick={() => {
-            setSearch('celebrations');
-            setPage(1);
-          }}
-          className="min-w-[85%] sm:min-w-[70%] md:min-w-0 snap-center bg-gradient-to-r from-purple-800 via-indigo-800 to-rose-800 rounded-2xl p-4 sm:p-5 text-white shadow-lg relative overflow-hidden flex flex-col justify-between h-36 sm:h-40 flex-shrink-0 border border-purple-400/30 cursor-pointer hover:scale-[1.02] transition-transform group"
+        <button
+          onClick={handleBannerClick}
+          className="min-w-[85%] sm:min-w-[70%] md:min-w-0 snap-center bg-gradient-to-r from-purple-800 via-indigo-800 to-rose-800 rounded-2xl p-4 sm:p-5 text-white shadow-lg relative overflow-hidden flex flex-col justify-between h-36 sm:h-40 flex-shrink-0 border border-purple-400/30 cursor-pointer hover:opacity-95 active:scale-[0.98] transition-all text-left focus:outline-none focus:ring-2 focus:ring-purple-400"
         >
           <div className="relative z-10">
             <div className="flex items-center gap-1.5">
@@ -330,28 +335,28 @@ export const ProductList: React.FC = () => {
                 Combo Deals
               </span>
             </div>
-            <h2 className="text-base sm:text-xl font-black mt-1.5 leading-snug drop-shadow-sm group-hover:text-pink-200 transition-colors">
+            <h2 className="text-base sm:text-xl font-black mt-1.5 leading-snug drop-shadow-sm">
               Cadbury Celebrations Box
             </h2>
             <p className="text-purple-100 text-[11px] sm:text-xs mt-0.5">
-              Ferrero Rocher, dry fruits & premium chocolate gift packs
+              Ferrero Rocher, dry fruits &amp; premium chocolate gift packs
             </p>
           </div>
           <div className="relative z-10 flex items-center justify-between">
-            <span className="text-xs font-black text-emerald-300">🎁 Free Gift Wrap · Explore ➔</span>
+            <span className="text-xs font-black text-emerald-300">🎁 Free Festive Gift Wrap</span>
+            <span className="flex items-center gap-1 text-[11px] font-black bg-white/20 px-2.5 py-1 rounded-full">
+              Shop Now <ArrowRight className="w-3 h-3" />
+            </span>
           </div>
-          <ShoppingBag className="absolute right-2 -bottom-2 w-28 h-28 text-white/10 pointer-events-none group-hover:scale-110 transition-transform" />
-        </div>
+          <ShoppingBag className="absolute right-2 -bottom-2 w-28 h-28 text-white/10 pointer-events-none" />
+        </button>
       </div>
 
       {/* Category Grid (Compact & Clean Blinkit/BigBasket Style) */}
       <div className="bg-white rounded-2xl border border-gray-200 p-3 sm:p-4 shadow-sm">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm sm:text-base font-extrabold text-gray-900 tracking-tight flex items-center gap-1.5">
-            <span>Shop by Category</span>
-            <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
-              {categories.length} Categories
-            </span>
+          <h2 className="text-sm sm:text-base font-extrabold text-gray-900 tracking-tight">
+            Shop by Category
           </h2>
           {selectedCategory && (
             <button
@@ -363,8 +368,8 @@ export const ProductList: React.FC = () => {
           )}
         </div>
 
-        {/* Responsive 4-col on mobile, 5-col on sm, 9-col on md/lg for 9 tiles */}
-        <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-9 gap-2 sm:gap-3">
+        {/* Responsive 4-col on mobile, 8-col on tablet/desktop for compact neat tiles */}
+        <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-8 gap-2 sm:gap-3">
           {/* "All" card */}
           <button
             onClick={() => { setSelectedCategory(''); setPage(1); }}
@@ -418,7 +423,7 @@ export const ProductList: React.FC = () => {
                   )}
                 </div>
                 <span className={`text-[11px] sm:text-xs font-bold text-center leading-tight line-clamp-2 max-w-[80px] ${
-                  isSelected ? 'text-emerald-700 font-extrabold' : 'text-gray-700'
+                  isSelected ? 'text-emerald-700' : 'text-gray-700'
                 }`}>{cat.name}</span>
               </button>
             );
@@ -455,7 +460,7 @@ export const ProductList: React.FC = () => {
       </div>
 
       {/* Main Content Layout (Sidebar on Desktop + Product Grid) */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8 items-start">
+      <div id="product-grid-section" className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8 items-start">
         {/* Desktop Sidebar Filters (Hidden on Mobile) */}
         <div className="hidden lg:block space-y-6 bg-white p-5 rounded-2xl border border-gray-200 shadow-sm sticky top-20">
           <div className="flex items-center justify-between border-b border-gray-100 pb-4">

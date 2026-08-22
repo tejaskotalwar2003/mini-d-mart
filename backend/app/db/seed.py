@@ -94,7 +94,6 @@ async def _run_seed(db: AsyncSession):
 
     # 4. Seed Categories
     categories_data = [
-        {"name": "Raksha Bandhan & Gifts", "slug": "raksha-bandhan-gifts"},
         {"name": "Fruits & Vegetables", "slug": "fruits-vegetables"},
         {"name": "Dairy & Bakery", "slug": "dairy-bakery"},
         {"name": "Snacks & Beverages", "slug": "snacks-beverages"},
@@ -102,6 +101,7 @@ async def _run_seed(db: AsyncSession):
         {"name": "Munchies & Chips", "slug": "munchies-chips"},
         {"name": "Personal Care", "slug": "personal-care"},
         {"name": "Household Essentials", "slug": "household-essentials"},
+        {"name": "Raksha Bandhan Specials", "slug": "raksha-bandhan"},
     ]
     category_map = {}
     for cat_info in categories_data:
@@ -127,28 +127,6 @@ async def _run_seed(db: AsyncSession):
     # Define 350 base product templates (50 items x 7 categories)
     # Each item has 3 size variants = 1,050 total products
     product_templates = {
-        "raksha-bandhan-gifts": [
-            ("Traditional Designer Peacock Rakhi", "Exquisite peacock motif rakhi adorned with beads, accompanied by auspicious Roli-Chawal packs.", "https://images.unsplash.com/photo-1629814249584-b40c3cb4d75d?auto=format&fit=crop&w=600&q=80", 99.00, ["Set of 1", "Set of 2", "Family Pack of 4"]),
-            ("Handcrafted Rudraksha & Silver Plated Rakhi", "Sacred Rudraksha bead embedded in a silver-plated casing with durable red thread.", "https://images.unsplash.com/photo-1599785209707-a456fc1337bb?auto=format&fit=crop&w=600&q=80", 149.00, ["Single Rakhi", "Twin Pack", "Set of 4"]),
-            ("Kids Superhero & Light Rakhi", "Fun light-up cartoon superhero rakhi for little brothers.", "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=600&q=80", 79.00, ["1 pc", "2 pcs", "Set of 3"]),
-            ("Premium Kundan & Pearl Bhaiya-Bhabhi Rakhi Set", "Royal Rajasthani kundan work rakhi set with matching bhabhi lumba.", "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=600&q=80", 249.00, ["1 Pair Set", "2 Pair Set", "Combo with Sweets"]),
-            ("Artisan Zardosi Golden Thread Rakhi", "Intricately embroidered Zardosi golden thread rakhi with velvet pouch.", "https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=600&q=80", 129.00, ["Set of 2", "Set of 4", "Family Pack of 8"]),
-            ("Cadbury Celebrations Rich Dry Fruit Gift Box", "Assortment of chocolate covered almonds, raisins and cashews in a premium festive box.", "https://images.unsplash.com/photo-1549007994-cb92caebd54b?auto=format&fit=crop&w=600&q=80", 299.00, ["150 g", "250 g", "450 g"]),
-            ("Ferrero Rocher Hazelnut Pralines Gift Box", "Crispy wafer coated in milk chocolate and hazelnut chunks with whole roasted hazelnut core.", "https://images.unsplash.com/photo-1582293041079-7814c2f12063?auto=format&fit=crop&w=600&q=80", 499.00, ["8 Pcs (100g)", "16 Pcs (200g)", "24 Pcs (300g)"]),
-            ("Nestle KitKat Festive Sharing Gift Pack", "Crisp wafer fingers coated with smooth milk chocolate in a festive rakhi box.", "https://images.unsplash.com/photo-1575224300306-1b8da36134ec?auto=format&fit=crop&w=600&q=80", 175.00, ["128 g", "200 g", "350 g"]),
-            ("Cadbury Dairy Milk Silk Rakhi Special Hamper", "Assorted Silk Oreo, Roasted Almond, Fruit & Nut bars in festive gift packaging.", "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=600&q=80", 350.00, ["250 g", "400 g", "650 g"]),
-            ("Haldiram's Pure Ghee Kaju Katli Gift Box", "Traditional melt-in-mouth diamond shaped cashew fudge with silver foil.", "https://images.unsplash.com/photo-1599785209796-786432b228bc?auto=format&fit=crop&w=600&q=80", 480.00, ["250 g", "500 g", "1 kg"]),
-            ("Bikaji Gulab Jamun Festive Tin", "Soft and spongy traditional Indian cottage cheese dumplings soaked in saffron sugar syrup.", "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=600&q=80", 240.00, ["500 g", "1 kg", "2 kg"]),
-            ("Ghasitaram Assorted Mithai Combo Box", "Delightful assortment of Motichoor Ladoo, Kaju Katli, Besan Ladoo, and Milk Peda.", "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=600&q=80", 320.00, ["400 g", "800 g", "1.2 kg"]),
-            ("Nutty Gritties Jumbo Almonds & Cashews Gift Jar", "Handpicked roasted California almonds & W240 crunchy cashews in premium airtight jars.", "https://images.unsplash.com/photo-1508061253366-f7da158b6d46?auto=format&fit=crop&w=600&q=80", 599.00, ["200 g", "400 g", "800 g"]),
-            ("Pure Ghee Motichoor Ladoo Festive Box", "Fragrant tiny gram flour pearls fried in desi ghee and flavored with green cardamom.", "https://images.unsplash.com/photo-1599785209707-a456fc1337bb?auto=format&fit=crop&w=600&q=80", 280.00, ["250 g", "500 g", "1 kg"]),
-            ("Brass Pooja Thali Set with Roli-Chawal", "Traditional engraved brass puja thali with chawal-katori, diya, and incense holder.", "https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=600&q=80", 199.00, ["Small (6 inch)", "Medium (8 inch)", "Large (10 inch)"]),
-            ("Roli Chawal & Chandan Tilak Festive Pack", "Pure organic kumkum, unbroken basmati rice grains, and fragrant sandalwood paste.", "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=600&q=80", 49.00, ["Single Pack", "Pack of 3", "Pack of 5"]),
-            ("Amul Dark Chocolate Festive Selection Pack", "55% and 75% rich cocoa gourmet dark chocolates in an elegant gift wrap.", "https://images.unsplash.com/photo-1549007994-cb92caebd54b?auto=format&fit=crop&w=600&q=80", 150.00, ["150 g", "300 g", "500 g"]),
-            ("Bikaji Soan Papdi Festive Pack", "Crispy, flaky and multi-layered sweet enriched with almonds and pistachios.", "https://images.unsplash.com/photo-1599785209796-786432b228bc?auto=format&fit=crop&w=600&q=80", 120.00, ["250 g", "500 g", "1 kg"]),
-            ("Bikaji Bikaneri Rasgulla Tin", "Juicy and porous spongy cottage cheese balls soaked in light sugar syrup.", "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=600&q=80", 220.00, ["500 g", "1 kg", "2 kg"]),
-            ("Hershey's Exotic Dark Chocolate Gift Box", "Exotic fruit flavors of Blueberry, Raspberry & Acai covered in luscious dark chocolate.", "https://images.unsplash.com/photo-1582293041079-7814c2f12063?auto=format&fit=crop&w=600&q=80", 350.00, ["150 g", "250 g", "400 g"]),
-        ],
         "fruits-vegetables": [
             ("Ratnagiri Alphonso Mango", "Sweet, aromatic, and rich Ratnagiri Alphonso mangoes.", "https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=600&q=80", 150.00, ["250 g", "500 g", "1 kg"]),
             ("Organic Red Tomatoes", "Farm-fresh juicy organic red tomatoes.", "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=600&q=80", 25.00, ["250 g", "500 g", "1 kg"]),
@@ -513,6 +491,33 @@ async def _run_seed(db: AsyncSession):
             ("Freshwrapp Cling Film Food Wrap", "Transparent stretchable moisture-locking food wrap.", "https://images.unsplash.com/photo-1584813470613-5b1c1cad3d69?auto=format&fit=crop&w=600&q=80", 110.00, ["30 meters", "60 meters", "100 meters"]),
             ("Microfiber Multipurpose Cleaning Cloths", "Lint-free ultra absorbent kitchen and vehicle dusters.", "https://images.unsplash.com/photo-1584813470613-5b1c1cad3d69?auto=format&fit=crop&w=600&q=80", 120.00, ["3 pcs pack", "6 pcs pack", "12 pcs pack"]),
         ],
+        "raksha-bandhan": [
+            # Rakhis & Accessories
+            ("Designer Lumba Rakhi Set", "Beautiful lumba rakhi set with decorative thread and golden beads for bhai-behen. Comes in a premium gift box.", "https://images.unsplash.com/photo-1513201099705-a9746072f579?auto=format&fit=crop&w=600&q=80", 129.00, ["1 Set", "2 Set Combo", "5 Set Bundle"]),
+            ("Silver Zardosi Designer Rakhi", "Hand-crafted premium zardosi rakhi with silver thread and stone embellishments. Perfect for gifting.", "https://images.unsplash.com/photo-1513201099705-a9746072f579?auto=format&fit=crop&w=600&q=80", 199.00, ["1 pc", "2 pc set", "5 pc set"]),
+            ("Kids Cartoon Rakhi Set", "Fun and colorful kids rakhi with popular cartoon characters: Doraemon, Spiderman, Minions. Kids favourite!", "https://images.unsplash.com/photo-1513201099705-a9746072f579?auto=format&fit=crop&w=600&q=80", 89.00, ["2 pcs", "5 pcs", "10 pcs"]),
+            ("Rudraksha Rakhi", "Spiritual Rudraksha bead rakhi with sandalwood fragrance. Auspicious gifting for brothers.", "https://images.unsplash.com/photo-1513201099705-a9746072f579?auto=format&fit=crop&w=600&q=80", 149.00, ["1 pc", "3 pcs", "5 pcs"]),
+            ("Fancy Stone & Pearl Rakhi", "Elegant pearl and coloured stone rakhi with adjustable thread. Beautiful and long-lasting.", "https://images.unsplash.com/photo-1513201099705-a9746072f579?auto=format&fit=crop&w=600&q=80", 119.00, ["1 pc", "2 pc", "5 pc"]),
+            ("Roli Chawal Tilak Set", "Traditional Raksha Bandhan puja thali set with Roli, Chawal, Kumkum, Mishri and Deepak.", "https://images.unsplash.com/photo-1513201099705-a9746072f579?auto=format&fit=crop&w=600&q=80", 79.00, ["Basic Set", "Premium Set", "Deluxe Thali"]),
+            # Chocolates & Mithai Gift Sets
+            ("Cadbury Celebrations Gift Pack", "Premium assorted Cadbury chocolates in a festive gift box. Includes 5 Silk bars, Bournville, and Gems.", "https://images.unsplash.com/photo-1481391319555-ade74a975e7a?auto=format&fit=crop&w=600&q=80", 299.00, ["Small 198g", "Medium 349g", "Large 586g"]),
+            ("Ferrero Rocher Gift Box", "Imported premium hazelnut chocolate truffles in a gold foil gift box. Classy gifting option.", "https://images.unsplash.com/photo-1481391319555-ade74a975e7a?auto=format&fit=crop&w=600&q=80", 349.00, ["8 pcs box", "16 pcs box", "24 pcs box"]),
+            ("Haldirams Kaju Katli Box", "Freshly made pure ghee kaju katli from Haldirams. Silver vark topped cashew fudge.", "https://images.unsplash.com/photo-1481391319555-ade74a975e7a?auto=format&fit=crop&w=600&q=80", 249.00, ["250 g box", "500 g box", "1 kg box"]),
+            ("Assorted Ladoo Gift Box", "Mix of Besan, Boondi, and Motichoor Ladoos packed in a beautiful festive box.", "https://images.unsplash.com/photo-1481391319555-ade74a975e7a?auto=format&fit=crop&w=600&q=80", 199.00, ["250 g", "500 g", "1 kg"]),
+            ("Belgian Dark Chocolate Bar", "Rich 70% dark Belgian chocolate with almonds. Premium imported festive gifting chocolate.", "https://images.unsplash.com/photo-1481391319555-ade74a975e7a?auto=format&fit=crop&w=600&q=80", 189.00, ["80g bar", "150g bar", "300g box"]),
+            ("KitKat Rakhi Special Bundle", "KitKat festive bundle with mini bars and wrapped rakhi thread. Fun & yummy gifting combo.", "https://images.unsplash.com/photo-1481391319555-ade74a975e7a?auto=format&fit=crop&w=600&q=80", 129.00, ["Small Pack", "Medium Pack", "Jumbo Pack"]),
+            ("Patanjali Ghee Mysore Pak", "Traditional South Indian Mysore pak made with Desi Ghee. Melt in mouth festive delicacy.", "https://images.unsplash.com/photo-1481391319555-ade74a975e7a?auto=format&fit=crop&w=600&q=80", 219.00, ["250 g", "500 g", "1 kg"]),
+            ("Milk Chocolate Assorted Box", "Delicious mix of milk chocolates - Dairy Milk, 5 Star, Eclairs and Caramels.", "https://images.unsplash.com/photo-1481391319555-ade74a975e7a?auto=format&fit=crop&w=600&q=80", 179.00, ["200 g box", "350 g box", "500 g box"]),
+            # Gift Hampers
+            ("Rakhi Premium Gift Hamper", "Complete Rakhi gift hamper with Designer Rakhi, Kaju Katli, Cadbury Celebrations, and Dry Fruits.", "https://images.unsplash.com/photo-1513201099705-a9746072f579?auto=format&fit=crop&w=600&q=80", 599.00, ["Basic Hamper", "Premium Hamper", "Luxury Hamper"]),
+            ("Dry Fruits Rakhi Gift Box", "Premium dry fruits combo - Badam, Kaju, Pista, Akhrot in a festive jute box.", "https://images.unsplash.com/photo-1481391319555-ade74a975e7a?auto=format&fit=crop&w=600&q=80", 449.00, ["250 g", "500 g", "1 kg"]),
+            ("Chocolate & Rakhi Combo", "Curated combo with 1 Designer Rakhi + Silk Chocolate + Roli Chawal. Perfect all-in-one Rakhi gift.", "https://images.unsplash.com/photo-1481391319555-ade74a975e7a?auto=format&fit=crop&w=600&q=80", 249.00, ["Small Set", "Classic Set", "Grand Set"]),
+            ("Silver Plated Rakhi Thali", "Beautiful silver-plated puja thali with Deepak, Roli, Chawal, and Aarti Diya for Raksha Bandhan.", "https://images.unsplash.com/photo-1513201099705-a9746072f579?auto=format&fit=crop&w=600&q=80", 349.00, ["Small Thali", "Medium Thali", "Grand Thali"]),
+            # Sweets
+            ("Fresh Gulab Jamun Box", "Soft, syrup-soaked fresh Gulab Jamuns. Made with Milk Mawa. Best served warm.", "https://images.unsplash.com/photo-1481391319555-ade74a975e7a?auto=format&fit=crop&w=600&q=80", 99.00, ["10 pcs", "20 pcs", "30 pcs"]),
+            ("Premium Soan Papdi Box", "Crispy flaky Soan Papdi wrapped in festive gifting box. Classic Rakhi mithai.", "https://images.unsplash.com/photo-1481391319555-ade74a975e7a?auto=format&fit=crop&w=600&q=80", 149.00, ["200 g", "500 g", "1 kg"]),
+            ("Badam Barfi Box", "Rich and creamy almond barfi with pure saffron and silver vark topping.", "https://images.unsplash.com/photo-1481391319555-ade74a975e7a?auto=format&fit=crop&w=600&q=80", 269.00, ["250 g", "500 g", "1 kg"]),
+        ],
     }
 
     size_multipliers = [
@@ -610,7 +615,7 @@ async def _run_seed(db: AsyncSession):
             )
             db.add(inv_large)
 
-    print(f"  + Seeded {total_products_count} products and variants across 7 categories.")
+    print(f"  + Seeded {total_products_count} products and variants across 8 categories (incl. Raksha Bandhan Specials).")
 
     # 6. Seed Pickup Slots for next 5 days
     today = date.today()
