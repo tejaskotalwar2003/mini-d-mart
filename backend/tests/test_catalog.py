@@ -76,8 +76,8 @@ async def test_get_products_returns_seeded_items(client: AsyncClient):
     response = await client.get("/api/v1/products?page_size=100")
     assert response.status_code == 200
     data = response.json()
-    # New seed: 175 base products (parent_id IS NULL) across 7 categories
-    assert data["total"] == 175
+    # New seed: 350 base products (parent_id IS NULL) across 7 categories
+    assert data["total"] == 350
     assert len(data["items"]) == 100  # page_size=100
 
 
