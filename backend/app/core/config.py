@@ -16,9 +16,13 @@ class Settings(BaseSettings):
     @classmethod
     def assemble_db_url(cls, v: str) -> str:
         if v.startswith("postgresql://"):
-            return v.replace("postgresql://", "postgresql+asyncpg://", 1)
+            v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
         elif v.startswith("postgres://"):
-            return v.replace("postgres://", "postgresql+asyncpg://", 1)
+            v = v.replace("postgres://", "postgresql+asyncpg://", 1)
+        if "?sslmode=" in v:
+            v = v.split("?sslmode=")[0]
+        elif "&sslmode=" in v:
+            v = v.split("&sslmode=")[0]
         return v
 
     @field_validator("CORS_ORIGINS", mode="before")
