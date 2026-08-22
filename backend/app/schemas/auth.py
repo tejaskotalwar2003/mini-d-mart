@@ -61,5 +61,48 @@ class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class AddressResponse(BaseModel):
+    id: uuid.UUID
+    line1: str
+    line2: Optional[str] = None
+    city: str
+    pincode: str
+    is_default: bool = False
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UserProfileResponse(BaseModel):
+    id: uuid.UUID
+    email: str
+    name: str
+    phone: Optional[str] = None
+    role: Role
+    is_active: bool
+    created_at: datetime
+    addresses: list[AddressResponse] = []
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UserProfileUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
+    address_line1: Optional[str] = None
+    address_line2: Optional[str] = None
+    city: Optional[str] = None
+    pincode: Optional[str] = None
+    current_password: Optional[str] = None
+    new_password: Optional[str] = None
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_email(cls, v: Optional[str]) -> Optional[str]:
+        if isinstance(v, str) and v.strip():
+            return v.strip().lower()
+        return v
+
+
 class RefreshRequest(BaseModel):
     refresh_token: str

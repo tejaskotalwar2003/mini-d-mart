@@ -12,6 +12,7 @@ import Cart from './routes/customer/Cart';
 import Checkout from './routes/customer/Checkout';
 import OrderHistory from './routes/customer/OrderHistory';
 import OrderDetail from './routes/customer/OrderDetail';
+import Profile from './routes/customer/Profile';
 import StaffDashboard from './routes/staff/StaffDashboard';
 import OrderQueue from './routes/staff/OrderQueue';
 import UpcomingPickups from './routes/staff/UpcomingPickups';
@@ -46,6 +47,7 @@ export const App: React.FC = () => {
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/orders" element={<OrderHistory />} />
                 <Route path="/orders/:id" element={<OrderDetail />} />
+                <Route path="/profile" element={<Profile />} />
               </Route>
 
               {/* Staff / Admin Protected Routes */}

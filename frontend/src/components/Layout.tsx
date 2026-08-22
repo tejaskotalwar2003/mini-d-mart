@@ -110,10 +110,15 @@ export const Layout: React.FC = () => {
             <span>Staff</span>
           </Link>
         ) : user ? (
-          <div className="flex flex-col items-center py-1 px-3 text-[10px] font-bold text-gray-500">
+          <Link
+            to="/profile"
+            className={`flex flex-col items-center py-1 px-3 rounded-lg text-[10px] font-bold transition-colors ${
+              isActive('/profile') ? 'text-emerald-700' : 'text-gray-500 hover:text-emerald-600'
+            }`}
+          >
             <User className="w-5 h-5 mb-0.5" />
             <span className="truncate max-w-[50px]">{user.name.split(' ')[0]}</span>
-          </div>
+          </Link>
         ) : (
           <Link
             to="/login"

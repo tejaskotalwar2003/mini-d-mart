@@ -1,5 +1,14 @@
 export type Role = 'CUSTOMER' | 'STAFF' | 'ADMIN';
 
+export interface Address {
+  id: string;
+  line1: string;
+  line2?: string | null;
+  city: string;
+  pincode: string;
+  is_default: boolean;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -8,6 +17,19 @@ export interface User {
   role: Role;
   is_active: boolean;
   created_at: string;
+  addresses?: Address[];
+}
+
+export interface UserProfileUpdatePayload {
+  name?: string;
+  email?: string;
+  phone?: string;
+  address_line1?: string;
+  address_line2?: string;
+  city?: string;
+  pincode?: string;
+  current_password?: string;
+  new_password?: string;
 }
 
 export interface TokenResponse {

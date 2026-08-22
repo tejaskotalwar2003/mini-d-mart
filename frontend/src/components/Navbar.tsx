@@ -16,6 +16,7 @@ import {
   MapPin,
   Sparkles,
   Zap,
+  User,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -136,14 +137,25 @@ export const Navbar: React.FC = () => {
           {/* User Account / Auth Buttons */}
           {user ? (
             <div className="flex items-center gap-2.5 pl-3 border-l border-emerald-600/60">
-              <div className="text-right">
-                <p className="text-xs font-bold leading-tight text-white">{user.name}</p>
-                <div className="flex items-center justify-end gap-1 mt-0.5">
-                  <span className="text-[9px] font-black uppercase px-1.5 py-0.2 bg-emerald-900 text-emerald-200 rounded-md border border-emerald-500/40">
-                    {user.role}
-                  </span>
+              <Link
+                to="/profile"
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-white/10 transition-all text-right group"
+                title="Edit Profile & Saved Addresses"
+              >
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-400 to-yellow-300 text-emerald-950 flex items-center justify-center font-black text-xs shadow-sm group-hover:scale-105 transition-transform">
+                  {user.name.charAt(0).toUpperCase()}
                 </div>
-              </div>
+                <div>
+                  <p className="text-xs font-bold leading-tight text-white group-hover:text-amber-200 transition-colors">
+                    {user.name}
+                  </p>
+                  <div className="flex items-center justify-end gap-1 mt-0.5">
+                    <span className="text-[9px] font-black uppercase px-1.5 py-0.2 bg-emerald-900 text-emerald-200 rounded-md border border-emerald-500/40">
+                      {user.role}
+                    </span>
+                  </div>
+                </div>
+              </Link>
 
               <button
                 onClick={handleLogout}
@@ -202,15 +214,24 @@ export const Navbar: React.FC = () => {
       {mobileMenuOpen && (
         <div className="md:hidden bg-emerald-900/95 backdrop-blur-xl border-t border-emerald-600/50 px-4 py-4 space-y-3 shadow-2xl animate-in slide-in-from-top-2 duration-200">
           {user && (
-            <div className="pb-3 border-b border-emerald-700/60 flex items-center justify-between">
-              <div>
-                <p className="text-sm font-black text-white">{user.name}</p>
-                <p className="text-xs text-emerald-300">{user.email}</p>
+            <Link
+              to="/profile"
+              onClick={() => setMobileMenuOpen(false)}
+              className="pb-3 border-b border-emerald-700/60 flex items-center justify-between hover:bg-emerald-800/40 p-2 rounded-xl transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-400 to-yellow-300 text-emerald-950 flex items-center justify-center font-black text-base shadow">
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-sm font-black text-white">{user.name}</p>
+                  <p className="text-xs text-emerald-300">{user.email}</p>
+                </div>
               </div>
               <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-emerald-950 text-emerald-200 rounded-lg border border-emerald-700">
                 {user.role}
               </span>
-            </div>
+            </Link>
           )}
 
           <div className="space-y-2">
@@ -224,14 +245,25 @@ export const Navbar: React.FC = () => {
             </Link>
 
             {user && (
-              <Link
-                to="/orders"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-bold rounded-xl hover:bg-emerald-800 transition-colors"
-              >
-                <PackageCheck className="w-4 h-4 text-emerald-300" />
-                <span>My Orders</span>
-              </Link>
+              <>
+                <Link
+                  to="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-bold rounded-xl hover:bg-emerald-800 transition-colors"
+                >
+                  <User className="w-4 h-4 text-amber-300" />
+                  <span>My Profile & Address</span>
+                </Link>
+
+                <Link
+                  to="/orders"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-bold rounded-xl hover:bg-emerald-800 transition-colors"
+                >
+                  <PackageCheck className="w-4 h-4 text-emerald-300" />
+                  <span>My Orders</span>
+                </Link>
+              </>
             )}
 
             {isStaffOrAdmin && (

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import apiClient from '../api/client';
-import type { TokenResponse, User } from '../types';
+import type { TokenResponse, User, UserProfileUpdatePayload } from '../types';
 
 // TOKEN PERSISTENCE SECURITY TRADEOFF RATIONALE:
 // - `refresh_token` is persisted in `localStorage` so that user sessions survive browser reloads
@@ -19,6 +19,8 @@ interface AuthContextType {
   role: string | null;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string, phone?: string) => Promise<void>;
+  updateProfile: (payload: UserProfileUpdatePayload) => Promise<User>;
+  refreshProfile: () => Promise<User | null>;
   logout: () => void;
 }
 
@@ -57,6 +59,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const res = await apiClient.get<User>('/api/v1/auth/me', {
       headers: { Authorization: `Bearer ${token}` },
     });
+    return res.data;
+  };
+
+  const refreshProfile = async (): Promise<User | null> => {
+    try {
+      const res = await apiClient.get<User>('/api/v1/auth/me');
+      setUser(res.data);
+      return res.data;
+    } catch {
+      return null;
+    }
+  };
+
+  const updateProfile = async (payload: UserProfileUpdatePayload): Promise<User> => {
+    const res = await apiClient.patch<User>('/api/v1/auth/me', payload);
+    setUser(res.data);
     return res.data;
   };
 
@@ -136,6 +154,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: user?.role || null,
         login,
         register,
+        updateProfile,
+        refreshProfile,
         logout,
       }}
     >
