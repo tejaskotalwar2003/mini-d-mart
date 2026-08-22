@@ -18,13 +18,15 @@ import {
   Plus,
   SlidersHorizontal,
   X,
+  ShoppingCart,
+  ArrowRight,
 } from 'lucide-react';
 
 type SelectedVariants = Record<string, ProductVariantInfo>;
 
 export const ProductList: React.FC = () => {
   const { user } = useAuth();
-  const { addToCart } = useCart();
+  const { addToCart, cart, itemCount } = useCart();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -519,33 +521,41 @@ export const ProductList: React.FC = () => {
                 return (
                   <div
                     key={product.id}
-                    className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden group"
+                    className="bg-white rounded-2xl border border-gray-200/80 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group card-hover-effect relative"
                   >
                     <Link to={`/products/${activeVariant.id}`} className="block relative p-2.5 sm:p-4">
-                      {/* Stock Badge */}
-                      <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10">
+                      {/* Top Badges: Stock Status & Delivery time */}
+                      <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10 flex flex-col gap-1">
                         {isOutOfStock ? (
-                          <span className="bg-red-500 text-white text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md uppercase tracking-wider">
-                            Out of Stock
+                          <span className="bg-red-500 text-white text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
+                            Sold Out
                           </span>
                         ) : isLowStock ? (
-                          <span className="bg-amber-500 text-white text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md uppercase tracking-wider">
-                            Low ({activeVariant.quantity_available})
+                          <span className="bg-amber-500 text-white text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
+                            Only {activeVariant.quantity_available} left
                           </span>
                         ) : (
-                          <span className="bg-emerald-600 text-white text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md uppercase tracking-wider">
+                          <span className="bg-emerald-600/90 backdrop-blur text-white text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
                             In Stock
                           </span>
                         )}
                       </div>
 
+                      {/* Superfast 10-Min Tag */}
+                      <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10">
+                        <span className="bg-amber-50 border border-amber-200 text-amber-800 text-[9px] sm:text-[10px] font-black px-1.5 sm:px-2 py-0.5 rounded-full shadow-xs flex items-center gap-0.5">
+                          ⚡ 10m
+                        </span>
+                      </div>
+
                       {/* Product Image */}
-                      <div className="w-full h-28 sm:h-44 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden mb-2 sm:mb-3 group-hover:scale-105 transition-transform duration-300">
+                      <div className="w-full h-32 sm:h-44 bg-gradient-to-b from-gray-50/80 to-gray-100/50 rounded-xl flex items-center justify-center overflow-hidden mb-2 sm:mb-3 group-hover:scale-105 transition-transform duration-300">
                         {product.image_url ? (
                           <img
                             src={product.image_url}
                             alt={product.name}
-                            className="w-full h-full object-contain p-1.5 sm:p-2"
+                            className="w-full h-full object-contain p-2 sm:p-3 drop-shadow-sm"
                             onError={(e) => {
                               (e.target as HTMLElement).style.display = 'none';
                             }}
@@ -556,21 +566,21 @@ export const ProductList: React.FC = () => {
                       </div>
 
                       {/* Category Badge */}
-                      <span className="text-[10px] sm:text-[11px] font-bold text-emerald-600 uppercase tracking-wider line-clamp-1">
+                      <span className="text-[10px] sm:text-[11px] font-extrabold text-emerald-700 uppercase tracking-wider line-clamp-1 bg-emerald-50 w-fit px-1.5 py-0.5 rounded-md">
                         {product.category_name}
                       </span>
 
                       {/* Product Name */}
-                      <h3 className="font-bold text-gray-900 text-xs sm:text-sm line-clamp-2 mt-0.5 min-h-[2rem] sm:min-h-[2.5rem] group-hover:text-emerald-600 transition-colors">
+                      <h3 className="font-bold text-gray-900 text-xs sm:text-sm line-clamp-2 mt-1 min-h-[2rem] sm:min-h-[2.5rem] group-hover:text-emerald-700 transition-colors leading-snug">
                         {product.name}
                       </h3>
 
                       {/* Price & Unit */}
-                      <div className="mt-1.5 sm:mt-2 flex items-baseline gap-1">
-                        <span className="text-base sm:text-lg font-extrabold text-gray-900">
+                      <div className="mt-1.5 sm:mt-2 flex items-baseline gap-1.5">
+                        <span className="text-base sm:text-xl font-black text-gray-900">
                           ₹{Number(activeVariant.price).toFixed(0)}
                         </span>
-                        <span className="text-[10px] sm:text-xs text-gray-400 font-medium truncate">
+                        <span className="text-[10px] sm:text-xs text-gray-400 font-semibold truncate">
                           / {activeVariant.unit}
                         </span>
                       </div>
@@ -588,10 +598,10 @@ export const ProductList: React.FC = () => {
                                 setSelectedVariants((prev) => ({ ...prev, [product.id]: variant }))
                               }
                               title={`₹${Number(variant.price).toFixed(0)} / ${variant.unit}`}
-                              className={`text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded border transition-all ${
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border transition-all ${
                                 isActive
-                                  ? 'bg-emerald-600 text-white border-emerald-600'
-                                  : 'bg-white text-gray-600 border-gray-300 hover:border-emerald-400 hover:text-emerald-600'
+                                  ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs scale-105'
+                                  : 'bg-white text-gray-600 border-gray-200 hover:border-emerald-400 hover:text-emerald-700'
                               }`}
                             >
                               {variant.unit}
@@ -615,13 +625,13 @@ export const ProductList: React.FC = () => {
                           handleAddToCart(variantProduct, e);
                         }}
                         disabled={isOutOfStock}
-                        className={`w-full py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1 sm:gap-2 transition-all shadow-sm ${
+                        className={`w-full py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-1.5 transition-all duration-200 shadow-sm hover:shadow-md ${
                           isOutOfStock
                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
-                            : 'bg-emerald-600 hover:bg-emerald-700 text-white active:scale-95'
+                            : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white active:scale-95 hover:scale-[1.02]'
                         }`}
                       >
-                        <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                        <Plus className="w-4 h-4" />
                         <span>{isOutOfStock ? 'Sold Out' : 'ADD'}</span>
                       </button>
                     </div>
@@ -766,6 +776,34 @@ export const ProductList: React.FC = () => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Floating Bottom View-Cart Bar (Mobile Only, Blinkit/Zepto Style) */}
+      {itemCount > 0 && (
+        <div className="sm:hidden fixed bottom-16 left-3 right-3 z-30 animate-in slide-in-from-bottom-4 duration-300">
+          <Link
+            to="/cart"
+            className="bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-700 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center justify-between border border-emerald-400/40 ring-2 ring-emerald-500/20"
+          >
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-xl">
+                <ShoppingCart className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs font-black leading-tight uppercase tracking-wider text-white">
+                  {itemCount} {itemCount === 1 ? 'ITEM' : 'ITEMS'}
+                </p>
+                <p className="text-[11px] text-emerald-200 font-bold">
+                  ₹{cart ? Number(cart.subtotal).toFixed(0) : '0'} plus taxes
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs font-black tracking-wide bg-amber-400 text-emerald-950 px-3.5 py-2 rounded-xl shadow-md">
+              <span>View Cart</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          </Link>
         </div>
       )}
     </div>

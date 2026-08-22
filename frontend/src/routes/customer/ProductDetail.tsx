@@ -249,13 +249,31 @@ export const ProductDetail: React.FC = () => {
           {product.description && (
             <div>
               <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
-                Description
+                Product Details & Highlights
               </h3>
-              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed bg-gray-50 p-3.5 rounded-xl border border-gray-100">
+              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed bg-gray-50/80 p-3.5 rounded-xl border border-gray-100">
                 {product.description}
               </p>
             </div>
           )}
+
+          {/* Quick Commerce Trust Highlights */}
+          <div className="grid grid-cols-2 gap-2.5 pt-2 border-t border-gray-100">
+            <div className="flex items-center gap-2 p-2.5 bg-emerald-50/60 rounded-xl border border-emerald-100 text-emerald-900">
+              <span className="text-base">⚡</span>
+              <div>
+                <p className="text-xs font-bold leading-tight">10-Min Delivery</p>
+                <p className="text-[10px] text-emerald-700">Straight to your door</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 p-2.5 bg-blue-50/60 rounded-xl border border-blue-100 text-blue-900">
+              <span className="text-base">🌿</span>
+              <div>
+                <p className="text-xs font-bold leading-tight">100% Quality</p>
+                <p className="text-[10px] text-blue-700">Freshly packed daily</p>
+              </div>
+            </div>
+          </div>
 
           {/* Desktop Quantity & Add to Cart Section */}
           <div className="hidden sm:block pt-4 space-y-4">
