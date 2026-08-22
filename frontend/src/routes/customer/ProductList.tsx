@@ -143,12 +143,12 @@ export const ProductList: React.FC = () => {
       emoji: '🍎',
     },
     'dairy-bakery': {
-      img: 'https://images.unsplash.com/photo-1628088062854-d1870b4553da?auto=format&fit=crop&w=300&q=80',
+      img: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=300&q=80',
       gradient: 'from-yellow-50 to-amber-100',
       emoji: '🥛',
     },
     'snacks-beverages': {
-      img: 'https://images.unsplash.com/photo-1527960471264-932f39eb5846?auto=format&fit=crop&w=300&q=80',
+      img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=300&q=80',
       gradient: 'from-orange-50 to-red-100',
       emoji: '🧃',
     },
@@ -168,12 +168,11 @@ export const ProductList: React.FC = () => {
       emoji: '🧴',
     },
     'household-essentials': {
-      img: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?auto=format&fit=crop&w=300&q=80',
+      img: 'https://images.unsplash.com/photo-1583947215259-38e31be8751f?auto=format&fit=crop&w=300&q=80',
       gradient: 'from-cyan-50 to-sky-100',
       emoji: '🧼',
     },
   };
-
 
   const activeFilterCount =
     (debouncedSearch ? 1 : 0) +
@@ -231,10 +230,10 @@ export const ProductList: React.FC = () => {
         </div>
       </div>
 
-      {/* Category Grid (BigBasket / JioMart style) */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base sm:text-lg font-extrabold text-gray-900">
+      {/* Category Grid (Compact & Clean Blinkit/BigBasket Style) */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-3 sm:p-4 shadow-sm">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm sm:text-base font-extrabold text-gray-900 tracking-tight">
             Shop by Category
           </h2>
           {selectedCategory && (
@@ -247,36 +246,36 @@ export const ProductList: React.FC = () => {
           )}
         </div>
 
-        {/* 4-column grid on all screens, 2-col on tiny mobile */}
-        <div className="grid grid-cols-2 xs:grid-cols-4 sm:grid-cols-4 gap-3 sm:gap-4">
+        {/* Responsive 4-col on mobile, 8-col on tablet/desktop for compact neat tiles */}
+        <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-8 gap-2 sm:gap-3">
           {/* "All" card */}
           <button
             onClick={() => { setSelectedCategory(''); setPage(1); }}
-            className="flex flex-col items-center gap-2 group focus:outline-none"
+            className="flex flex-col items-center gap-1.5 group focus:outline-none"
           >
-            <div className={`w-full aspect-square rounded-2xl overflow-hidden relative transition-all duration-200 bg-gradient-to-br from-emerald-50 to-teal-100 border-2 ${
-              selectedCategory === '' ? 'border-emerald-500 shadow-md' : 'border-transparent hover:border-emerald-300 hover:shadow-sm'
+            <div className={`w-full max-w-[84px] aspect-square rounded-xl sm:rounded-2xl overflow-hidden relative transition-all duration-200 bg-gradient-to-br from-emerald-50 to-teal-100 border-2 ${
+              selectedCategory === '' ? 'border-emerald-500 shadow-sm ring-2 ring-emerald-400 ring-offset-1 scale-105' : 'border-gray-100 hover:border-emerald-300 hover:scale-105'
             }`}>
               <img
-                src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80"
+                src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=200&q=80"
                 alt="All Products"
                 className="w-full h-full object-cover"
               />
               {selectedCategory === '' && (
-                <div className="absolute top-2 right-2 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center shadow">
-                  <span className="text-white text-[9px] font-black">✓</span>
+                <div className="absolute top-1 right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center shadow">
+                  <span className="text-white text-[8px] font-black">✓</span>
                 </div>
               )}
             </div>
-            <span className={`text-xs sm:text-sm font-bold text-center leading-tight ${
-              selectedCategory === '' ? 'text-emerald-700' : 'text-gray-800'
-            }`}>All Products</span>
+            <span className={`text-[11px] sm:text-xs font-bold text-center leading-tight truncate max-w-[80px] ${
+              selectedCategory === '' ? 'text-emerald-700' : 'text-gray-700'
+            }`}>All</span>
           </button>
 
           {categories.map((cat) => {
             const isSelected = selectedCategory === cat.id;
             const meta = categoryImageMeta[cat.slug] || {
-              img: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=300&q=80',
+              img: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=200&q=80',
               gradient: 'from-gray-50 to-gray-100',
               emoji: '📦',
             };
@@ -284,10 +283,10 @@ export const ProductList: React.FC = () => {
               <button
                 key={cat.id}
                 onClick={() => { setSelectedCategory(cat.id); setPage(1); }}
-                className="flex flex-col items-center gap-2 group focus:outline-none"
+                className="flex flex-col items-center gap-1.5 group focus:outline-none"
               >
-                <div className={`w-full aspect-square rounded-2xl overflow-hidden relative transition-all duration-200 bg-gradient-to-br ${meta.gradient} border-2 ${
-                  isSelected ? 'border-emerald-500 shadow-md scale-[1.03]' : 'border-transparent hover:border-emerald-300 hover:shadow-sm hover:scale-[1.02]'
+                <div className={`w-full max-w-[84px] aspect-square rounded-xl sm:rounded-2xl overflow-hidden relative transition-all duration-200 bg-gradient-to-br ${meta.gradient} border-2 ${
+                  isSelected ? 'border-emerald-500 shadow-sm ring-2 ring-emerald-400 ring-offset-1 scale-105' : 'border-gray-100 hover:border-emerald-300 hover:scale-105'
                 }`}>
                   <img
                     src={meta.img}
@@ -296,13 +295,13 @@ export const ProductList: React.FC = () => {
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                   {isSelected && (
-                    <div className="absolute top-2 right-2 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center shadow">
-                      <span className="text-white text-[9px] font-black">✓</span>
+                    <div className="absolute top-1 right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center shadow">
+                      <span className="text-white text-[8px] font-black">✓</span>
                     </div>
                   )}
                 </div>
-                <span className={`text-xs sm:text-sm font-bold text-center leading-tight ${
-                  isSelected ? 'text-emerald-700' : 'text-gray-800'
+                <span className={`text-[11px] sm:text-xs font-bold text-center leading-tight line-clamp-2 max-w-[80px] ${
+                  isSelected ? 'text-emerald-700' : 'text-gray-700'
                 }`}>{cat.name}</span>
               </button>
             );
