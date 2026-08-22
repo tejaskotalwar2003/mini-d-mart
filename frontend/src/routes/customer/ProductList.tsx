@@ -219,6 +219,41 @@ export const ProductList: React.FC = () => {
       gradient: 'from-rose-50 to-amber-100',
       emoji: '🪢',
     },
+    'cooking-essentials': {
+      img: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=300&q=80',
+      gradient: 'from-yellow-50 to-orange-100',
+      emoji: '🍳',
+    },
+    'dry-fruits-nuts': {
+      img: 'https://images.unsplash.com/photo-1563412885-139e4045ec52?auto=format&fit=crop&w=300&q=80',
+      gradient: 'from-amber-50 to-yellow-100',
+      emoji: '🥜',
+    },
+    'pulses-grains': {
+      img: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=300&q=80',
+      gradient: 'from-lime-50 to-green-100',
+      emoji: '🌾',
+    },
+    'breakfast-cereals': {
+      img: 'https://images.unsplash.com/photo-1543733037-3c05fd8d01f4?auto=format&fit=crop&w=300&q=80',
+      gradient: 'from-orange-50 to-amber-100',
+      emoji: '🥣',
+    },
+    'baby-care': {
+      img: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=300&q=80',
+      gradient: 'from-blue-50 to-sky-100',
+      emoji: '👶',
+    },
+    'health-wellness': {
+      img: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?auto=format&fit=crop&w=300&q=80',
+      gradient: 'from-teal-50 to-emerald-100',
+      emoji: '💊',
+    },
+    'pet-care': {
+      img: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=300&q=80',
+      gradient: 'from-violet-50 to-purple-100',
+      emoji: '🐾',
+    },
   };
 
   // Helper: get the Raksha Bandhan category ID from the fetched categories list
