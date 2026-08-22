@@ -214,7 +214,18 @@ export const OrderQueue: React.FC = () => {
                           {order.fulfillment_type}
                         </span>
                       </td>
-                      <td className="p-4 font-medium text-gray-700">{order.items.length} items</td>
+                      <td className="p-4 font-medium text-gray-700">
+                        <span className="font-bold text-gray-900">
+                          {order.items && order.items.length > 0
+                            ? `${order.items.reduce((sum, item) => sum + (item.quantity || 1), 0)} items`
+                            : '0 items'}
+                        </span>
+                        {order.items && order.items.length > 1 && (
+                          <span className="block text-[10px] text-gray-500 font-normal">
+                            ({order.items.length} unique products)
+                          </span>
+                        )}
+                      </td>
                       <td className="p-4 font-extrabold text-gray-900">
                         ₹{Number(order.total).toFixed(2)}
                       </td>

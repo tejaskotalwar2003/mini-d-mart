@@ -10,6 +10,7 @@ from app.models.user import User, Role
 from app.models.catalog import Category, Product
 from app.models.store import Store, Inventory
 from app.models.pickup_slot import PickupSlot
+from app.models.order import Order, OrderItem, OrderStatus, FulfillmentType, OrderStatusLog
 
 async def seed(db: Optional[AsyncSession] = None):
     if db is not None:
@@ -21,12 +22,14 @@ async def seed(db: Optional[AsyncSession] = None):
 async def _run_seed(db: AsyncSession):
     print("[SEED] Starting Mini D-Mart Database Seeding (1,050+ Products)...")
 
-    # 1. Clean up catalog tables
-    print("  - Cleaning up old catalog tables...")
-    await db.execute(text("DELETE FROM inventory;"))
-    await db.execute(text("DELETE FROM cart_items;"))
-    await db.execute(text("DELETE FROM order_items;"))
+    # 1. Clean up catalog & order tables
+    print("  - Cleaning up old catalog & order tables...")
     await db.execute(text("DELETE FROM return_requests;"))
+    await db.execute(text("DELETE FROM order_status_logs;"))
+    await db.execute(text("DELETE FROM order_items;"))
+    await db.execute(text("DELETE FROM orders;"))
+    await db.execute(text("DELETE FROM cart_items;"))
+    await db.execute(text("DELETE FROM inventory;"))
     await db.execute(text("DELETE FROM products;"))
     await db.execute(text("DELETE FROM categories;"))
     await db.commit()
@@ -767,6 +770,81 @@ async def _run_seed(db: AsyncSession):
                 )
                 db.add(slot)
                 slots_created += 1
+
+    # 7. Seed Sample Orders with Items for Staff & Customer Testing
+    print("  - Seeding sample active & completed orders with real items...")
+    cust_res = await db.execute(select(User).where(User.email == "customer@minidmart.com"))
+    cust_user = cust_res.scalar_one_or_none()
+
+    if cust_user:
+        # Fetch some products to include in sample orders
+        prods_res = await db.execute(select(Product).limit(15))
+        sample_prods = list(prods_res.scalars().all())
+
+        if len(sample_prods) >= 6:
+            orders_to_seed = [
+                ("ORD-781042-DELIVERY", OrderStatus.CONFIRMED, FulfillmentType.DELIVERY, [
+                    (sample_prods[0], 2),
+                    (sample_prods[1], 1),
+                    (sample_prods[2], 3),
+                ]),
+                ("ORD-781043-PREPARING", OrderStatus.PREPARING, FulfillmentType.DELIVERY, [
+                    (sample_prods[3], 1),
+                    (sample_prods[4], 2),
+                ]),
+                ("ORD-781044-READY", OrderStatus.READY_FOR_PICKUP, FulfillmentType.PICKUP, [
+                    (sample_prods[5], 2),
+                    (sample_prods[0], 1),
+                    (sample_prods[2], 2),
+                ]),
+                ("ORD-781045-DISPATCH", OrderStatus.OUT_FOR_DELIVERY, FulfillmentType.DELIVERY, [
+                    (sample_prods[1], 2),
+                    (sample_prods[3], 1),
+                ]),
+                ("ORD-781046-DELIVERED", OrderStatus.COMPLETED, FulfillmentType.DELIVERY, [
+                    (sample_prods[4], 3),
+                    (sample_prods[5], 1),
+                ]),
+            ]
+
+            for ord_num, ord_status, ful_type, items_spec in orders_to_seed:
+                subtotal = sum(p.price * qty for p, qty in items_spec)
+                tax = round(subtotal * Decimal("0.05"), 2)
+                total = subtotal + tax
+
+                sample_order = Order(
+                    order_number=ord_num,
+                    user_id=cust_user.id,
+                    status=ord_status,
+                    fulfillment_type=ful_type,
+                    subtotal=subtotal,
+                    tax=tax,
+                    total=total,
+                )
+                db.add(sample_order)
+                await db.flush()
+
+                for prod_item, qty in items_spec:
+                    db.add(
+                        OrderItem(
+                            order_id=sample_order.id,
+                            product_id=prod_item.id,
+                            quantity=qty,
+                            unit_price_at_order=prod_item.price,
+                        )
+                    )
+
+                db.add(
+                    OrderStatusLog(
+                        order_id=sample_order.id,
+                        from_status=None,
+                        to_status=ord_status,
+                        changed_by=cust_user.id,
+                        note="Seeded demo order with items.",
+                    )
+                )
+
+            print("  + Seeded 5 demo orders with real items and quantities.")
 
     await db.commit()
     print("[SUCCESS] Database seeding complete!")
