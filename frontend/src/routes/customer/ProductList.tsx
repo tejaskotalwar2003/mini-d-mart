@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import apiClient from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -11,8 +11,6 @@ import {
   ArrowUpDown,
   ShoppingBag,
   RotateCcw,
-  ChevronLeft,
-  ChevronRight,
   AlertTriangle,
   Package,
   Plus,
@@ -20,6 +18,9 @@ import {
   X,
   ShoppingCart,
   ArrowRight,
+  Gift,
+  Sparkles,
+  Loader2,
 } from 'lucide-react';
 
 type SelectedVariants = Record<string, ProductVariantInfo>;
@@ -36,6 +37,7 @@ export const ProductList: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedVariants, setSelectedVariants] = useState<SelectedVariants>({});
 
@@ -50,13 +52,13 @@ export const ProductList: React.FC = () => {
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('newest');
   const [page, setPage] = useState<number>(1);
-  const pageSize = 12;
+  const pageSize = 16;
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   // Debounce search (~400ms)
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search);
-      setPage(1);
     }, 400);
     return () => clearTimeout(handler);
   }, [search]);
@@ -74,13 +76,17 @@ export const ProductList: React.FC = () => {
     fetchCategories();
   }, []);
 
-  // Fetch Products
-  const fetchProducts = async () => {
-    setIsLoading(true);
+  // Fetch Products (Initial & Infinite Append)
+  const fetchProducts = async (pageNum: number, isInitial: boolean = false) => {
+    if (isInitial) {
+      setIsLoading(true);
+    } else {
+      setIsLoadingMore(true);
+    }
     setError(null);
     try {
       const params: Record<string, any> = {
-        page,
+        page: pageNum,
         page_size: pageSize,
         sort_by: sortBy,
       };
@@ -91,18 +97,54 @@ export const ProductList: React.FC = () => {
       if (maxPrice && !isNaN(Number(maxPrice))) params.max_price = Number(maxPrice);
 
       const res = await apiClient.get<ProductListResponse>('/api/v1/products', { params });
-      setProducts(res.data.items);
+      if (pageNum === 1) {
+        setProducts(res.data.items);
+      } else {
+        setProducts((prev) => {
+          const existingIds = new Set(prev.map((p) => p.id));
+          const newItems = res.data.items.filter((p) => !existingIds.has(p.id));
+          return [...prev, ...newItems];
+        });
+      }
       setTotal(res.data.total);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to fetch products. Please try again.');
     } finally {
       setIsLoading(false);
+      setIsLoadingMore(false);
     }
   };
 
+  // Reset & load page 1 on filter changes
   useEffect(() => {
-    fetchProducts();
-  }, [debouncedSearch, selectedCategory, minPrice, maxPrice, sortBy, page]);
+    setPage(1);
+    fetchProducts(1, true);
+  }, [debouncedSearch, selectedCategory, minPrice, maxPrice, sortBy]);
+
+  // Load next page when page increments (> 1)
+  useEffect(() => {
+    if (page > 1) {
+      fetchProducts(page, false);
+    }
+  }, [page]);
+
+  // Infinite Scroll Intersection Observer (Blinkit style)
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoading && !isLoadingMore && products.length < total) {
+          setPage((prevPage) => prevPage + 1);
+        }
+      },
+      { threshold: 0.1, rootMargin: '300px' }
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [isLoading, isLoadingMore, products.length, total]);
 
   const handleClearFilters = () => {
     setSearch('');
@@ -135,8 +177,6 @@ export const ProductList: React.FC = () => {
       });
     }
   };
-
-  const totalPages = Math.ceil(total / pageSize) || 1;
 
   const categoryImageMeta: Record<string, { img: string; gradient: string; emoji: string }> = {
     'fruits-vegetables': {
@@ -183,52 +223,96 @@ export const ProductList: React.FC = () => {
     (sortBy !== 'newest' ? 1 : 0);
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
-      {/* Promotional Offer Banners (Swipeable Carousel on Mobile, Grid on Desktop) */}
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-5 space-y-4 sm:space-y-6">
+      {/* 🪢 Raksha Bandhan Festive Top Announcement Ticker */}
+      <div className="bg-gradient-to-r from-rose-900 via-amber-700 to-rose-900 text-amber-100 rounded-2xl p-2.5 sm:p-3 shadow-md border border-amber-500/40 flex items-center justify-between gap-2 overflow-hidden relative animate-shimmer">
+        <div className="flex items-center gap-2 text-xs sm:text-sm font-black z-10 truncate">
+          <span className="text-base sm:text-lg animate-bounce">🪢</span>
+          <span className="bg-amber-400 text-rose-950 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-xs">
+            Rakhi Dhamaka
+          </span>
+          <span className="hidden md:inline text-white">Celebrate the bond of love!</span>
+          <span className="text-amber-200 font-semibold truncate">
+            Designer Rakhis, Kaju Katli & Cadbury Gift Packs delivered in 10 mins 🎁
+          </span>
+        </div>
+        <div className="hidden sm:flex items-center gap-1 text-[11px] font-black text-amber-300 bg-black/30 px-3 py-1 rounded-xl whitespace-nowrap z-10 border border-amber-400/30">
+          <Sparkles className="w-3.5 h-3.5 text-yellow-300" /> Use Code: <span className="text-white underline">RAKHI50</span>
+        </div>
+      </div>
+
+      {/* Promotional Festive Banners (Raksha Bandhan Theme, Swipeable on Mobile) */}
       <div className="flex md:grid md:grid-cols-3 gap-3 sm:gap-4 overflow-x-auto pb-2 md:pb-0 scrollbar-none snap-x snap-mandatory">
-        {/* Banner 1 */}
-        <div className="min-w-[85%] sm:min-w-[70%] md:min-w-0 snap-center bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl p-4 sm:p-5 text-white shadow-md relative overflow-hidden flex flex-col justify-between h-32 sm:h-36 flex-shrink-0">
+        {/* Banner 1: Rakhi Special */}
+        <div className="min-w-[85%] sm:min-w-[70%] md:min-w-0 snap-center bg-gradient-to-r from-rose-700 via-pink-700 to-amber-700 rounded-2xl p-4 sm:p-5 text-white shadow-lg relative overflow-hidden flex flex-col justify-between h-36 sm:h-40 flex-shrink-0 border border-rose-400/30">
           <div className="relative z-10">
-            <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-              10-Min Delivery
-            </span>
-            <h2 className="text-base sm:text-lg font-black mt-1 leading-snug">Superfast Grocery Delivery</h2>
-            <p className="text-emerald-100 text-[11px] sm:text-xs mt-0.5">Fresh produce at wholesale rates</p>
+            <div className="flex items-center gap-1.5">
+              <span className="bg-white/20 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
+                🪢 Rakhi Special
+              </span>
+              <span className="bg-amber-400 text-rose-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
+                Flat 30% OFF
+              </span>
+            </div>
+            <h2 className="text-base sm:text-xl font-black mt-1.5 leading-snug drop-shadow-sm">
+              Designer Rakhis & Thalis
+            </h2>
+            <p className="text-rose-100 text-[11px] sm:text-xs mt-0.5">
+              Silver, thread, zardosi & cartoon sets with Roli-Chawal
+            </p>
           </div>
           <div className="relative z-10 flex items-center justify-between">
-            <span className="text-[11px] font-bold text-yellow-300">⚡ Free Delivery on ₹199+</span>
+            <span className="text-xs font-black text-amber-300">⚡ Starting from ₹29 · 10m Delivery</span>
           </div>
-          <ShoppingBag className="absolute right-2 -bottom-2 w-24 h-24 sm:w-28 sm:h-28 text-white/10 pointer-events-none" />
+          <Gift className="absolute right-2 -bottom-2 w-28 h-28 text-white/10 pointer-events-none" />
         </div>
 
-        {/* Banner 2 */}
-        <div className="min-w-[85%] sm:min-w-[70%] md:min-w-0 snap-center bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl p-4 sm:p-5 text-white shadow-md relative overflow-hidden flex flex-col justify-between h-32 sm:h-36 flex-shrink-0">
+        {/* Banner 2: Festive Sweets & Mithai */}
+        <div className="min-w-[85%] sm:min-w-[70%] md:min-w-0 snap-center bg-gradient-to-r from-amber-600 via-yellow-600 to-orange-700 rounded-2xl p-4 sm:p-5 text-white shadow-lg relative overflow-hidden flex flex-col justify-between h-36 sm:h-40 flex-shrink-0 border border-amber-400/30">
           <div className="relative z-10">
-            <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-              Festive Deals
-            </span>
-            <h2 className="text-base sm:text-lg font-black mt-1 leading-snug">Up to 40% OFF Munchies</h2>
-            <p className="text-amber-100 text-[11px] sm:text-xs mt-0.5">Chips, drinks & confectionery</p>
+            <div className="flex items-center gap-1.5">
+              <span className="bg-white/20 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
+                🍬 Festive Mithai
+              </span>
+              <span className="bg-white text-amber-900 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
+                Up to 40% OFF
+              </span>
+            </div>
+            <h2 className="text-base sm:text-xl font-black mt-1.5 leading-snug drop-shadow-sm">
+              Fresh Kaju Katli & Ladoos
+            </h2>
+            <p className="text-amber-100 text-[11px] sm:text-xs mt-0.5">
+              Haldiram's, Bikaji & freshly packed pure ghee sweets
+            </p>
           </div>
           <div className="relative z-10 flex items-center justify-between">
-            <span className="text-[11px] font-bold text-yellow-100">🎉 Grab Big Pack Combos</span>
+            <span className="text-xs font-black text-yellow-100">🎉 Pure Ghee Assortments</span>
           </div>
-          <Package className="absolute right-2 -bottom-2 w-24 h-24 sm:w-28 sm:h-28 text-white/10 pointer-events-none" />
+          <Package className="absolute right-2 -bottom-2 w-28 h-28 text-white/10 pointer-events-none" />
         </div>
 
-        {/* Banner 3 */}
-        <div className="min-w-[85%] sm:min-w-[70%] md:min-w-0 snap-center bg-gradient-to-r from-cyan-600 to-blue-700 rounded-2xl p-4 sm:p-5 text-white shadow-md relative overflow-hidden flex flex-col justify-between h-32 sm:h-36 flex-shrink-0">
+        {/* Banner 3: Cadbury Celebrations & Hampers */}
+        <div className="min-w-[85%] sm:min-w-[70%] md:min-w-0 snap-center bg-gradient-to-r from-purple-800 via-indigo-800 to-rose-800 rounded-2xl p-4 sm:p-5 text-white shadow-lg relative overflow-hidden flex flex-col justify-between h-36 sm:h-40 flex-shrink-0 border border-purple-400/30">
           <div className="relative z-10">
-            <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-              Fresh Farm Harvest
-            </span>
-            <h2 className="text-base sm:text-lg font-black mt-1 leading-snug">Organic Fruits & Veggies</h2>
-            <p className="text-cyan-100 text-[11px] sm:text-xs mt-0.5">Handpicked farm produce</p>
+            <div className="flex items-center gap-1.5">
+              <span className="bg-white/20 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
+                🍫 Gift Hampers
+              </span>
+              <span className="bg-amber-400 text-indigo-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
+                Combo Deals
+              </span>
+            </div>
+            <h2 className="text-base sm:text-xl font-black mt-1.5 leading-snug drop-shadow-sm">
+              Cadbury Celebrations Box
+            </h2>
+            <p className="text-purple-100 text-[11px] sm:text-xs mt-0.5">
+              Ferrero Rocher, dry fruits & premium chocolate gift packs
+            </p>
           </div>
           <div className="relative z-10 flex items-center justify-between">
-            <span className="text-[11px] font-bold text-emerald-200">🌿 100% Quality Guaranteed</span>
+            <span className="text-xs font-black text-emerald-300">🎁 Free Festive Gift Wrap</span>
           </div>
-          <ShoppingBag className="absolute right-2 -bottom-2 w-24 h-24 sm:w-28 sm:h-28 text-white/10 pointer-events-none" />
+          <ShoppingBag className="absolute right-2 -bottom-2 w-28 h-28 text-white/10 pointer-events-none" />
         </div>
       </div>
 
@@ -482,7 +566,7 @@ export const ProductList: React.FC = () => {
               <AlertTriangle className="w-10 h-10 sm:w-12 sm:h-12 text-red-500 mx-auto" />
               <h3 className="text-base sm:text-lg font-bold text-gray-900">{error}</h3>
               <button
-                onClick={fetchProducts}
+                onClick={() => fetchProducts(1, true)}
                 className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold text-sm rounded-lg transition-colors shadow-sm"
               >
                 Retry Request
@@ -641,32 +725,27 @@ export const ProductList: React.FC = () => {
             </div>
           )}
 
-          {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 pt-4 sm:pt-6">
-              <button
-                onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                disabled={page === 1}
-                className="p-2 rounded-xl border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition-colors"
-                aria-label="Previous Page"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
+          {/* Infinite Scroll Sentinel & Loading Indicators (Blinkit Style) */}
+          <div ref={loadMoreRef} className="py-6 flex flex-col items-center justify-center">
+            {isLoadingMore && (
+              <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-2xl border border-gray-200 shadow-sm animate-pulse">
+                <Loader2 className="w-5 h-5 text-emerald-600 animate-spin" />
+                <span className="text-xs font-bold text-gray-700">
+                  Loading more fresh products ({products.length} of {total})...
+                </span>
+              </div>
+            )}
 
-              <span className="text-xs sm:text-sm font-bold text-gray-700 px-3">
-                Page {page} of {totalPages}
-              </span>
-
-              <button
-                onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-                disabled={page === totalPages}
-                className="p-2 rounded-xl border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition-colors"
-                aria-label="Next Page"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-          )}
+            {!isLoading && !isLoadingMore && products.length >= total && products.length > 0 && (
+              <div className="text-center py-4 space-y-1">
+                <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200 px-4 py-2 rounded-2xl text-xs font-black shadow-xs">
+                  <span>🎉</span>
+                  <span>You've explored all {total} fresh products!</span>
+                </div>
+                <p className="text-[11px] text-gray-400 font-medium">Delivered to your door in 10 minutes ⚡</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
