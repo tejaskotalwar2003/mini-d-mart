@@ -38,18 +38,18 @@ export const Navbar: React.FC = () => {
     <header className="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white shadow-lg sticky top-0 z-50 backdrop-blur-md bg-opacity-95 border-b border-emerald-600/40">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
         {/* Left Section: Brand Logo + Superfast Delivery Badge */}
-        <div className="flex items-center gap-3 sm:gap-6 flex-shrink-0">
-          <Link to="/products" className="flex items-center gap-2.5 group">
-            <div className="bg-gradient-to-tr from-yellow-300 via-amber-400 to-yellow-200 text-emerald-950 p-2 rounded-2xl group-hover:scale-105 group-hover:rotate-3 transition-all duration-300 shadow-md ring-2 ring-white/20">
-              <ShoppingBasket className="w-5 h-5 sm:w-6 sm:h-6" />
+        <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+          <Link to="/products" className="flex items-center gap-1.5 sm:gap-2.5 group">
+            <div className="bg-gradient-to-tr from-yellow-300 via-amber-400 to-yellow-200 text-emerald-950 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl group-hover:scale-105 group-hover:rotate-3 transition-all duration-300 shadow-md ring-2 ring-white/20">
+              <ShoppingBasket className="w-4 h-4 sm:w-6 sm:h-6" />
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-lg sm:text-xl font-black tracking-tight text-white drop-shadow-sm">
+              <div className="flex items-center gap-1">
+                <span className="text-base sm:text-xl font-black tracking-tight text-white drop-shadow-sm whitespace-nowrap">
                   Mini <span className="text-amber-300">D-Mart</span>
                 </span>
-                <span className="hidden xl:inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/15 text-[10px] font-black rounded-full text-emerald-100 uppercase tracking-widest border border-white/10">
-                  <Sparkles className="w-2.5 h-2.5 text-amber-300" /> Express
+                <span className="inline-flex items-center gap-0.5 px-1 sm:px-1.5 py-0.2 bg-white/20 text-[9px] sm:text-[10px] font-black rounded-full text-emerald-100 uppercase tracking-widest border border-white/10">
+                  <Sparkles className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-amber-300" /> Express
                 </span>
               </div>
               <span className="hidden sm:block text-[10px] text-emerald-200 font-semibold uppercase tracking-wider -mt-0.5">
@@ -58,18 +58,20 @@ export const Navbar: React.FC = () => {
             </div>
           </Link>
 
-          {/* Quick Commerce 10-Min Delivery Pill */}
-          <div className="hidden lg:flex items-center gap-2 bg-emerald-900/60 border border-emerald-500/30 px-3 py-1.5 rounded-full shadow-inner">
+          {/* Quick Commerce 10-Min Delivery Pill (Visible on Mobile & Desktop) */}
+          <div className="flex items-center gap-1.5 sm:gap-2 bg-emerald-900/80 border border-emerald-500/40 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-inner">
             <div className="relative flex items-center justify-center">
-              <span className="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+              <span className="animate-ping absolute inline-flex h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-emerald-400"></span>
             </div>
-            <div className="flex items-center gap-1 text-xs">
-              <Zap className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
-              <span className="font-extrabold text-amber-300">10 MINS</span>
-              <span className="text-emerald-300 font-medium">·</span>
-              <MapPin className="w-3 h-3 text-emerald-300" />
-              <span className="text-emerald-100 font-medium truncate max-w-[120px]">Home - 411048</span>
+            <div className="flex items-center gap-1 text-[10px] sm:text-xs">
+              <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-300 fill-amber-300" />
+              <span className="font-black text-amber-300 whitespace-nowrap">10 MINS</span>
+              <span className="text-emerald-300 font-medium hidden xs:inline">·</span>
+              <MapPin className="w-3 h-3 text-emerald-300 hidden xs:inline" />
+              <span className="text-emerald-100 font-medium truncate max-w-[80px] sm:max-w-[120px] hidden sm:inline">
+                Home - 411048
+              </span>
             </div>
           </div>
         </div>
