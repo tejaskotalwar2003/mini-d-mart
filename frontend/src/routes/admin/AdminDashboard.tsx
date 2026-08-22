@@ -172,7 +172,28 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Quick Access Action Modules */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Link
+          to="/staff/orders"
+          className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 hover:shadow-md hover:border-emerald-400 transition-all group flex flex-col justify-between"
+        >
+          <div className="space-y-3">
+            <div className="p-3 bg-emerald-100 text-emerald-700 rounded-xl w-fit flex items-center gap-2">
+              <Store className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 group-hover:text-emerald-600 transition-colors">
+              Customer Order Queue
+            </h3>
+            <p className="text-xs text-gray-500 leading-relaxed">
+              Track live customer orders, update order status (Confirm, Prepare, Dispatch, Deliver), and view pickup/delivery slots.
+            </p>
+          </div>
+          <div className="pt-6 flex items-center gap-2 text-xs font-extrabold text-emerald-600">
+            View Live Orders
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </Link>
+
         <Link
           to="/admin/products"
           className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 hover:shadow-md hover:border-emerald-400 transition-all group flex flex-col justify-between"
