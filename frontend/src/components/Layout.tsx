@@ -3,6 +3,8 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { ToastProvider } from '../context/ToastContext';
+import ToastContainer from './ToastContainer';
 import {
   ShoppingBasket,
   Heart,
@@ -25,6 +27,7 @@ export const Layout: React.FC = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
+    <ToastProvider>
     <div className="min-h-screen flex flex-col bg-gray-50 text-gray-900 font-sans antialiased pb-16 sm:pb-0">
       <Navbar />
       <main className="flex-grow">
@@ -123,7 +126,10 @@ export const Layout: React.FC = () => {
           </Link>
         )}
       </nav>
+      {/* Global Toast Notifications */}
+      <ToastContainer />
     </div>
+    </ToastProvider>
   );
 };
 

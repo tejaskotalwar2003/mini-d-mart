@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import apiClient from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { useToast } from '../../context/ToastContext';
 import type { Category, Product, ProductListResponse, ProductVariantInfo } from '../../types';
 import {
   Search,
@@ -24,6 +25,7 @@ type SelectedVariants = Record<string, ProductVariantInfo>;
 export const ProductList: React.FC = () => {
   const { user } = useAuth();
   const { addToCart } = useCart();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -122,7 +124,13 @@ export const ProductList: React.FC = () => {
 
     const err = await addToCart(product.id, 1);
     if (err) {
-      alert(err);
+      showToast(err, { type: 'error' });
+    } else {
+      showToast(product.name, {
+        type: 'success',
+        subMessage: `₹${Number(product.price).toFixed(0)} · ${product.unit}`,
+        imageUrl: product.image_url || undefined,
+      });
     }
   };
 
