@@ -84,7 +84,16 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 @app.get("/health", tags=["Health"])
 async def health_check():
-    return {"status": "ok"}
+    db_status = "ok"
+    error_msg = None
+    try:
+        from sqlalchemy import text
+        async with AsyncSessionLocal() as session:
+            await session.execute(text("SELECT 1"))
+    except Exception as e:
+        db_status = "error"
+        error_msg = str(e)
+    return {"status": "ok", "database": db_status, "error": error_msg}
 
 
 app.include_router(api_router, prefix="/api/v1")
