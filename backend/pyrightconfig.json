@@ -1,8 +1,14 @@
 {
-  "venvPath": ".",
-  "venv": "venv",
+  "include": [
+    "."
+  ],
+  "exclude": [
+    "venv",
+    "**/__pycache__"
+  ],
+  "pythonPath": "./venv/Scripts/python.exe",
   "extraPaths": [
     ".",
-    "venv/Lib/site-packages"
+    "./venv/Lib/site-packages"
   ]
 }
