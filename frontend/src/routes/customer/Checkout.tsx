@@ -84,7 +84,7 @@ type PaymentMethodType = 'UPI' | 'RAZORPAY' | 'CARD' | 'COD' | 'NETBANKING';
 
 export const Checkout: React.FC = () => {
   const { user } = useAuth();
-  const { cart, fetchCart } = useCart();
+  const { cart, fetchCart, clearCartState } = useCart();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
@@ -291,6 +291,7 @@ export const Checkout: React.FC = () => {
         }
       }
 
+      clearCartState();
       await fetchCart();
       showToast('Order Placed Successfully!', {
         type: 'success',

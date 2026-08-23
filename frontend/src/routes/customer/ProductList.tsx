@@ -727,7 +727,7 @@ export const ProductList: React.FC = () => {
 
       {/* 🛒 Floating Quick Cart Bar (Bottom Viewport Notification) */}
       {itemCount > 0 && cart && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-11/12 max-w-lg bg-emerald-950/95 backdrop-blur-md text-white px-4 sm:px-5 py-3 rounded-2xl shadow-2xl border border-emerald-500/50 flex items-center justify-between gap-3 animate-slide-up">
+        <div className="fixed bottom-16 sm:bottom-4 left-1/2 -translate-x-1/2 z-40 w-11/12 max-w-lg bg-emerald-950/95 backdrop-blur-md text-white px-4 sm:px-5 py-3 rounded-2xl shadow-2xl border border-emerald-500/50 flex items-center justify-between gap-3 animate-slide-up">
           <div className="flex items-center gap-3">
             <div className="bg-gradient-to-tr from-amber-400 to-yellow-300 text-emerald-950 p-2 rounded-xl shadow-xs">
               <ShoppingCart className="w-5 h-5" />
