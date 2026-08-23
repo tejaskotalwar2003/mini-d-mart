@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import apiClient from '../../api/client';
+import { useCart } from '../../context/CartContext';
 import type { Category, Product, ProductListResponse } from '../../types';
 import HeroSlider from '../../components/HeroSlider';
 import CategorySlider, { categoryImageMeta } from '../../components/CategorySlider';
@@ -14,13 +15,19 @@ import {
   X,
   Sparkles,
   ArrowLeft,
+  ArrowRight,
   Tag,
   SearchX,
   Check,
+  Zap,
+  ShieldCheck,
+  Percent,
+  ShoppingCart,
 } from 'lucide-react';
 
 export const ProductList: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { cart, itemCount } = useCart();
 
   // Extract query filter params from URL
   const querySearch = searchParams.get('search') || '';
@@ -610,6 +617,49 @@ export const ProductList: React.FC = () => {
                 onSelectCategory={handleSelectCategory}
               />
 
+              {/* 🛡️ Mini DMart Value & Trust Pillars Ribbon */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3.5">
+                <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200/80 p-3 sm:p-3.5 rounded-2xl flex items-center gap-2.5 shadow-xs group hover:scale-[1.02] transition-transform">
+                  <div className="bg-emerald-600 text-white p-2 rounded-xl shadow-xs group-hover:rotate-6 transition-transform">
+                    <Zap className="w-4 h-4 fill-amber-300 text-amber-300" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-emerald-950">10-Min Delivery</h4>
+                    <p className="text-[10px] text-emerald-700 font-semibold">Lightning rapid drops</p>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-amber-50 to-yellow-50 border border-amber-200/80 p-3 sm:p-3.5 rounded-2xl flex items-center gap-2.5 shadow-xs group hover:scale-[1.02] transition-transform">
+                  <div className="bg-amber-500 text-white p-2 rounded-xl shadow-xs group-hover:rotate-6 transition-transform">
+                    <Sparkles className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-amber-950">100% Farm Fresh</h4>
+                    <p className="text-[10px] text-amber-800 font-semibold">Handpicked daily stock</p>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200/80 p-3 sm:p-3.5 rounded-2xl flex items-center gap-2.5 shadow-xs group hover:scale-[1.02] transition-transform">
+                  <div className="bg-blue-600 text-white p-2 rounded-xl shadow-xs group-hover:rotate-6 transition-transform">
+                    <Percent className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-blue-950">Wholesale Prices</h4>
+                    <p className="text-[10px] text-blue-700 font-semibold">Guaranteed maximum savings</p>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200/80 p-3 sm:p-3.5 rounded-2xl flex items-center gap-2.5 shadow-xs group hover:scale-[1.02] transition-transform">
+                  <div className="bg-purple-600 text-white p-2 rounded-xl shadow-xs group-hover:rotate-6 transition-transform">
+                    <ShieldCheck className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-purple-950">Instant Returns</h4>
+                    <p className="text-[10px] text-purple-700 font-semibold">7-day doorstep guarantee</p>
+                  </div>
+                </div>
+              </div>
+
               {/* Categorized Product Sections (4 products per category with Show More) */}
               <div className="space-y-6 sm:space-y-8">
                 {isLoading ? (
@@ -674,6 +724,35 @@ export const ProductList: React.FC = () => {
           )}
         </main>
       </div>
+
+      {/* 🛒 Floating Quick Cart Bar (Bottom Viewport Notification) */}
+      {itemCount > 0 && cart && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-11/12 max-w-lg bg-emerald-950/95 backdrop-blur-md text-white px-4 sm:px-5 py-3 rounded-2xl shadow-2xl border border-emerald-500/50 flex items-center justify-between gap-3 animate-slide-up">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-tr from-amber-400 to-yellow-300 text-emerald-950 p-2 rounded-xl shadow-xs">
+              <ShoppingCart className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-xs sm:text-sm font-black flex items-center gap-1.5">
+                <span>{itemCount} {itemCount === 1 ? 'Item' : 'Items'} in Bag</span>
+                <span className="text-emerald-400">·</span>
+                <span className="text-amber-300 font-extrabold text-sm sm:text-base">
+                  ₹{Number(cart.subtotal).toFixed(0)}
+                </span>
+              </div>
+              <p className="text-[10px] text-emerald-200 font-semibold">⚡ Extra savings applied · 10m delivery</p>
+            </div>
+          </div>
+
+          <Link
+            to="/checkout"
+            className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-300 hover:from-amber-300 hover:to-yellow-200 text-emerald-950 font-black text-xs sm:text-sm rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1 whitespace-nowrap"
+          >
+            <span>Checkout</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      )}
 
       {/* Mobile Filter Drawer / Bottom Sheet */}
       {mobileFilterOpen && (
